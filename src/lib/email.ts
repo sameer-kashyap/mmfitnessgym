@@ -18,6 +18,15 @@ interface EmailParams {
 // This function sends an email to the member
 export async function sendEmail(params: EmailParams): Promise<boolean> {
   try {
+    // Check if emailjs is available
+    if (!window.emailjs) {
+      console.error("EmailJS is not loaded");
+      toast.error("Email service not available");
+      return false;
+    }
+    
+    console.log("Sending email with params:", params);
+    
     // Send email to the member
     const memberResponse = await window.emailjs.send(
       serviceId,
@@ -25,6 +34,8 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
       params,
       publicKey
     );
+    
+    console.log("Email send response:", memberResponse);
     
     if (memberResponse.status === 200) {
       toast.success("Email sent successfully to member");
@@ -48,6 +59,7 @@ export function sendWelcomeEmail(member: Member): Promise<boolean> {
     message: `Dear ${member.fullName},\n\nWelcome to Royal Fitness Gym! Your membership has been activated and will expire in ${member.subscriptionDuration} days.\n\nThank you for choosing Royal Fitness Gym.\n\nBest regards,\nRoyal Fitness Team`
   };
   
+  console.log("Sending welcome email to:", member.email);
   return sendEmail(params);
 }
 
@@ -62,6 +74,6 @@ export function sendPaymentReminderEmail(
     message: `Dear ${member.fullName},\n\nThis is a friendly reminder that your Royal Fitness Gym membership will expire in ${daysLeft} days.\n\nPlease renew your subscription to continue enjoying our services.\n\nBest regards,\nRoyal Fitness Team`
   };
   
+  console.log("Sending reminder email to:", member.email);
   return sendEmail(params);
 }
-

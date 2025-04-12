@@ -20,6 +20,7 @@ const MemberContext = createContext<MemberContextType | undefined>(undefined);
 export function MemberProvider({ children }: { children: ReactNode }) {
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
+  const [emailJSLoaded, setEmailJSLoaded] = useState(false);
 
   // Load data from localStorage on initial render
   useEffect(() => {
@@ -36,7 +37,14 @@ export function MemberProvider({ children }: { children: ReactNode }) {
     script.src = "https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js";
     script.async = true;
     script.onload = () => {
+      console.log("EmailJS script loaded");
       window.emailjs.init("H-8V_wOp5vS_BD8gO");
+      setEmailJSLoaded(true);
+      loadMembers();
+    };
+    script.onerror = () => {
+      console.error("Failed to load EmailJS");
+      toast.error("Failed to load email service");
       loadMembers();
     };
     document.body.appendChild(script);
@@ -112,7 +120,19 @@ export function MemberProvider({ children }: { children: ReactNode }) {
     setMembers(prev => [...prev, newMember]);
     
     // Send welcome email
-    sendWelcomeEmail(newMember);
+    console.log("Attempting to send welcome email to:", newMember.email);
+    if (emailJSLoaded) {
+      sendWelcomeEmail(newMember)
+        .then(success => {
+          if (!success) {
+            console.error("Failed to send welcome email");
+          }
+        });
+    } else {
+      console.error("EmailJS not loaded, can't send welcome email");
+      toast.error("Email service not ready, welcome email could not be sent");
+    }
+    
     toast.success(`${newMember.fullName} has been added as a member`);
   };
 

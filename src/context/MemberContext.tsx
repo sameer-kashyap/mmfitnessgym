@@ -36,7 +36,7 @@ export function MemberProvider({ children }: { children: ReactNode }) {
     script.src = "https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js";
     script.async = true;
     script.onload = () => {
-      window.emailjs.init(process.env.EMAILJS_PUBLIC_KEY || "H-8V_wOp5vS_BD8gO");
+      window.emailjs.init("H-8V_wOp5vS_BD8gO");
       loadMembers();
     };
     document.body.appendChild(script);

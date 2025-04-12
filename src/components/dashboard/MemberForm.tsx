@@ -21,7 +21,6 @@ const MemberForm: React.FC = () => {
     fullName: "",
     email: "",
     phone: "",
-    ownerEmail: "abhaysam123456@gmail.com", // Default owner email
     subscriptionDuration: "30", // Default to 30 days
     paymentStatus: "paid"
   });
@@ -79,7 +78,6 @@ const MemberForm: React.FC = () => {
       fullName: formData.fullName.trim(),
       email: formData.email.trim(),
       phone: formData.phone.trim(),
-      ownerEmail: formData.ownerEmail.trim(),
       subscriptionDuration: parseInt(formData.subscriptionDuration),
       paymentStatus: formData.paymentStatus as 'paid' | 'unpaid'
     });
@@ -89,7 +87,6 @@ const MemberForm: React.FC = () => {
       fullName: "",
       email: "",
       phone: "",
-      ownerEmail: "abhaysam123456@gmail.com",
       subscriptionDuration: "30",
       paymentStatus: "paid"
     });
@@ -143,18 +140,6 @@ const MemberForm: React.FC = () => {
             {formErrors.phone && (
               <p className="text-red-500 text-sm">Valid phone number is required</p>
             )}
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="ownerEmail">Owner Email</Label>
-            <Input
-              id="ownerEmail"
-              name="ownerEmail"
-              value={formData.ownerEmail}
-              onChange={handleChange}
-              disabled
-            />
-            <p className="text-xs text-muted-foreground">Email to receive alerts (pre-filled)</p>
           </div>
           
           <div className="space-y-2">

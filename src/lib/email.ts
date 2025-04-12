@@ -16,17 +16,32 @@ interface EmailParams {
   [key: string]: unknown; // Add index signature to make it compatible with Record<string, unknown>
 }
 
+// This function sends an email to both the member and owner
 export async function sendEmail(params: EmailParams): Promise<boolean> {
   try {
-    const response = await window.emailjs.send(
+    // Send email to the member
+    const memberResponse = await window.emailjs.send(
       serviceId,
       templateId,
       params,
       publicKey
     );
     
-    if (response.status === 200) {
-      toast.success("Email sent successfully");
+    // Send the same email to the owner
+    const ownerParams = {
+      ...params,
+      user_email: params.owner_email, // Change recipient to owner
+    };
+    
+    const ownerResponse = await window.emailjs.send(
+      serviceId,
+      templateId,
+      ownerParams,
+      publicKey
+    );
+    
+    if (memberResponse.status === 200 && ownerResponse.status === 200) {
+      toast.success("Email sent successfully to member and owner");
       return true;
     } else {
       toast.error("Failed to send email");

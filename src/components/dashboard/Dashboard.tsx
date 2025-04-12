@@ -1,28 +1,19 @@
-
 import React from "react";
 import { Separator } from "../ui/separator";
 import MemberForm from "./MemberForm";
 import MemberList from "./MemberList";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
-} from "../ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { useMembers } from "../../context/MemberContext";
 import { Dumbbell, UserCheck, Clock, AlertTriangle } from "lucide-react";
-
 const Dashboard: React.FC = () => {
-  const { filteredMembers } = useMembers();
-  
+  const {
+    filteredMembers
+  } = useMembers();
   const totalMembers = filteredMembers('all').length;
   const activeMembers = filteredMembers('active').length;
   const expiringSoonMembers = filteredMembers('expiring-soon').length;
   const graceMembers = filteredMembers('grace-period').length;
-
-  return (
-    <div className="dashboard-container">
+  return <div className="dashboard-container">
       <div className="flex flex-col gap-6">
         {/* Header */}
         <div className="flex justify-between items-center">
@@ -94,15 +85,13 @@ const Dashboard: React.FC = () => {
                   Manage your gym members and track their subscription status
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="px-0">
                 <MemberList />
               </CardContent>
             </Card>
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Dashboard;

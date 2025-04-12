@@ -8,7 +8,6 @@ export interface Member {
   fullName: string;
   email: string;
   phone: string;
-  ownerEmail: string;
   subscriptionDuration: number; // in days
   startDate: string; // ISO date string
   paymentStatus: PaymentStatus;
@@ -18,3 +17,4 @@ export interface Member {
     oneDay: boolean;
   };
 }
+

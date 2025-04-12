@@ -13,6 +13,7 @@ interface EmailParams {
   owner_email: string;
   message: string;
   subject: string;
+  [key: string]: unknown; // Add index signature to make it compatible with Record<string, unknown>
 }
 
 export async function sendEmail(params: EmailParams): Promise<boolean> {

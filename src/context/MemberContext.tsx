@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { Member } from "../types/member";
 import { calculateDaysLeft, generateId, getMemberStatus } from "../lib/utils";
@@ -22,7 +21,6 @@ export function MemberProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [emailJSLoaded, setEmailJSLoaded] = useState(false);
 
-  // Load data from localStorage on initial render
   useEffect(() => {
     const loadMembers = () => {
       const savedMembers = localStorage.getItem("gym-members");
@@ -32,7 +30,6 @@ export function MemberProvider({ children }: { children: ReactNode }) {
       setLoading(false);
     };
 
-    // Load EmailJS SDK
     const script = document.createElement("script");
     script.src = "https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js";
     script.async = true;
@@ -54,7 +51,6 @@ export function MemberProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  // Check for expired members and send reminders
   useEffect(() => {
     if (loading) return;
 
@@ -64,7 +60,6 @@ export function MemberProvider({ children }: { children: ReactNode }) {
         const memberStatus = getMemberStatus(member);
         let updatedMember = { ...member };
 
-        // Send reminders if needed
         if (memberStatus === 'expiring-soon') {
           if (daysLeft === 7 && !member.reminderSent.sevenDays) {
             sendPaymentReminderEmail(member, 7);
@@ -81,7 +76,6 @@ export function MemberProvider({ children }: { children: ReactNode }) {
         return updatedMember;
       });
 
-      // Filter out members who are past the grace period
       const filteredMembers = updatedMembers.filter(member => {
         const status = getMemberStatus(member);
         return status !== 'expired';
@@ -93,12 +87,11 @@ export function MemberProvider({ children }: { children: ReactNode }) {
 
       setMembers(filteredMembers);
       localStorage.setItem("gym-members", JSON.stringify(filteredMembers));
-    }, 60000); // Check every minute
+    }, 60000);
 
     return () => clearInterval(interval);
   }, [members, loading]);
 
-  // Save to localStorage whenever members change
   useEffect(() => {
     if (!loading) {
       localStorage.setItem("gym-members", JSON.stringify(members));
@@ -119,7 +112,6 @@ export function MemberProvider({ children }: { children: ReactNode }) {
 
     setMembers(prev => [...prev, newMember]);
     
-    // Send welcome email
     console.log("Attempting to send welcome email to:", newMember.email);
     if (emailJSLoaded) {
       sendWelcomeEmail(newMember)

@@ -4,7 +4,7 @@ import { toast } from "../components/ui/sonner";
 
 // EmailJS credentials
 const serviceId = "service_s3ek2ky";
-const templateId = "template_1nv590n";
+const templateId = "template_saaskwi"; // Updated template ID
 const publicKey = "H-8V_wOp5vS_BD8gO";
 
 interface EmailParams {
@@ -39,6 +39,17 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
     
     if (memberResponse.status === 200) {
       toast.success("Email sent successfully to member");
+      
+      // Store the email data locally
+      const sentEmails = JSON.parse(localStorage.getItem('sent-emails') || '[]');
+      sentEmails.push({
+        timestamp: new Date().toISOString(),
+        recipient: params.user_email,
+        subject: params.subject,
+        status: 'sent'
+      });
+      localStorage.setItem('sent-emails', JSON.stringify(sentEmails));
+      
       return true;
     } else {
       toast.error("Failed to send email");

@@ -14,6 +14,9 @@ interface EmailParams {
   user_email: string;
   message: string;
   subject: string;
+  joining_date?: string;
+  sameer: string; // For {{sameer}} in From Name
+  email: string; // For {{email}} in Reply To
   [key: string]: unknown;
 }
 
@@ -30,13 +33,20 @@ export async function sendEmail(params: EmailParams, isAdminNotification = false
     // Select the appropriate template
     const templateId = isAdminNotification ? adminTemplateId : userTemplateId;
     
-    console.log(`Sending email with ${isAdminNotification ? 'admin' : 'user'} template:`, params);
+    // Ensure required template parameters are set
+    const emailParams = {
+      ...params,
+      sameer: "Royal Fitness Gym", // For {{sameer}} in From Name
+      email: "abhaysam123456@gmail.com", // For {{email}} in Reply To
+    };
+    
+    console.log(`Sending email with ${isAdminNotification ? 'admin' : 'user'} template:`, emailParams);
     
     // Send email using the selected template
     const response = await window.emailjs.send(
       serviceId,
       templateId,
-      params,
+      emailParams,
       publicKey
     );
     
@@ -69,12 +79,18 @@ export async function sendEmail(params: EmailParams, isAdminNotification = false
 }
 
 export function sendWelcomeEmail(member: Member): Promise<boolean> {
+  // Format joining date (startDate)
+  const joiningDate = new Date(member.startDate).toLocaleDateString();
+  
   // Send email to the member
   const memberParams: EmailParams = {
     user_name: member.fullName,
     user_email: member.email,
     subject: "Welcome to Royal Fitness Gym!",
-    message: `Dear ${member.fullName},\n\nWelcome to Royal Fitness Gym! Your membership has been activated and will expire in ${member.subscriptionDuration} days.\n\nThank you for choosing Royal Fitness Gym.\n\nBest regards,\nRoyal Fitness Team`
+    message: `Dear ${member.fullName},\n\nWelcome to Royal Fitness Gym! Your membership has been activated and will expire in ${member.subscriptionDuration} days.\n\nThank you for choosing Royal Fitness Gym.\n\nBest regards,\nRoyal Fitness Team`,
+    joining_date: joiningDate,
+    sameer: "Royal Fitness Gym",
+    email: "abhaysam123456@gmail.com"
   };
   
   console.log("Sending welcome email to:", member.email);
@@ -88,7 +104,9 @@ export function sendWelcomeEmail(member: Member): Promise<boolean> {
     member_name: member.fullName,
     member_email: member.email,
     subscription: `${member.subscriptionDuration} days`,
-    payment: member.paymentStatus
+    payment: member.paymentStatus,
+    sameer: "Royal Fitness Gym",
+    email: "abhaysam123456@gmail.com"
   };
   
   // First send to member, then to admin
@@ -105,12 +123,18 @@ export function sendPaymentReminderEmail(
   member: Member, 
   daysLeft: number
 ): Promise<boolean> {
+  // Format joining date
+  const joiningDate = new Date(member.startDate).toLocaleDateString();
+  
   // Send reminder to member
   const memberParams: EmailParams = {
     user_name: member.fullName,
     user_email: member.email,
     subject: `Royal Fitness Gym - Your membership expires in ${daysLeft} days`,
-    message: `Dear ${member.fullName},\n\nThis is a friendly reminder that your Royal Fitness Gym membership will expire in ${daysLeft} days.\n\nPlease renew your subscription to continue enjoying our services.\n\nBest regards,\nRoyal Fitness Team`
+    message: `Dear ${member.fullName},\n\nThis is a friendly reminder that your Royal Fitness Gym membership will expire in ${daysLeft} days.\n\nPlease renew your subscription to continue enjoying our services.\n\nBest regards,\nRoyal Fitness Team`,
+    joining_date: joiningDate,
+    sameer: "Royal Fitness Gym",
+    email: "abhaysam123456@gmail.com"
   };
   
   // Also notify admin about expiring membership
@@ -122,7 +146,9 @@ export function sendPaymentReminderEmail(
     member_name: member.fullName,
     member_email: member.email,
     days_left: daysLeft.toString(),
-    payment: member.paymentStatus
+    payment: member.paymentStatus,
+    sameer: "Royal Fitness Gym",
+    email: "abhaysam123456@gmail.com"
   };
   
   console.log("Sending reminder email to:", member.email);

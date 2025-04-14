@@ -15,6 +15,9 @@ interface EmailParams {
   message: string;
   subject: string;
   joining_date?: string;
+  expiry_date?: string;
+  remaining_days?: string;
+  gym_name?: string;
   sameer: string; // For {{sameer}} in From Name
   email: string; // For {{email}} in Reply To
   [key: string]: unknown;
@@ -38,6 +41,7 @@ export async function sendEmail(params: EmailParams, isAdminNotification = false
       ...params,
       sameer: "Royal Fitness Gym", // For {{sameer}} in From Name
       email: "abhaysam123456@gmail.com", // For {{email}} in Reply To
+      gym_name: "Royal Fitness Gym",
     };
     
     console.log(`Sending email with ${isAdminNotification ? 'admin' : 'user'} template:`, emailParams);
@@ -82,13 +86,20 @@ export function sendWelcomeEmail(member: Member): Promise<boolean> {
   // Format joining date (startDate)
   const joiningDate = new Date(member.startDate).toLocaleDateString();
   
+  // Calculate expiry date
+  const expiryDate = new Date(new Date(member.startDate).getTime() + (member.subscriptionDuration * 24 * 60 * 60 * 1000));
+  const formattedExpiryDate = expiryDate.toLocaleDateString();
+  
   // Send email to the member
   const memberParams: EmailParams = {
     user_name: member.fullName,
     user_email: member.email,
     subject: "Welcome to Royal Fitness Gym!",
-    message: `Dear ${member.fullName},\n\nWelcome to Royal Fitness Gym! Your membership has been activated and will expire in ${member.subscriptionDuration} days.\n\nThank you for choosing Royal Fitness Gym.\n\nBest regards,\nRoyal Fitness Team`,
+    message: `Dear ${member.fullName},\n\nWelcome to Royal Fitness Gym! Your membership has been activated and will expire on ${formattedExpiryDate} (${member.subscriptionDuration} days).\n\nThank you for choosing Royal Fitness Gym.\n\nBest regards,\nRoyal Fitness Team`,
     joining_date: joiningDate,
+    expiry_date: formattedExpiryDate,
+    remaining_days: member.subscriptionDuration.toString(),
+    gym_name: "Royal Fitness Gym",
     sameer: "Royal Fitness Gym",
     email: "abhaysam123456@gmail.com"
   };
@@ -100,11 +111,12 @@ export function sendWelcomeEmail(member: Member): Promise<boolean> {
     user_name: "Admin",
     user_email: adminEmail,
     subject: "New Member Registration",
-    message: `A new member has registered:\n\nName: ${member.fullName}\nEmail: ${member.email}\nSubscription Duration: ${member.subscriptionDuration} days\nPayment Status: ${member.paymentStatus}`,
+    message: `A new member has registered:\n\nName: ${member.fullName}\nEmail: ${member.email}\nSubscription Duration: ${member.subscriptionDuration} days\nExpiry Date: ${formattedExpiryDate}\nPayment Status: ${member.paymentStatus}`,
     member_name: member.fullName,
     member_email: member.email,
     subscription: `${member.subscriptionDuration} days`,
     payment: member.paymentStatus,
+    expiry_date: formattedExpiryDate,
     sameer: "Royal Fitness Gym",
     email: "abhaysam123456@gmail.com"
   };
@@ -126,13 +138,20 @@ export function sendPaymentReminderEmail(
   // Format joining date
   const joiningDate = new Date(member.startDate).toLocaleDateString();
   
+  // Calculate expiry date
+  const expiryDate = new Date(new Date(member.startDate).getTime() + (member.subscriptionDuration * 24 * 60 * 60 * 1000));
+  const formattedExpiryDate = expiryDate.toLocaleDateString();
+  
   // Send reminder to member
   const memberParams: EmailParams = {
     user_name: member.fullName,
     user_email: member.email,
     subject: `Royal Fitness Gym - Your membership expires in ${daysLeft} days`,
-    message: `Dear ${member.fullName},\n\nThis is a friendly reminder that your Royal Fitness Gym membership will expire in ${daysLeft} days.\n\nPlease renew your subscription to continue enjoying our services.\n\nBest regards,\nRoyal Fitness Team`,
+    message: `Dear ${member.fullName},\n\nThis is a friendly reminder that your Royal Fitness Gym membership will expire in ${daysLeft} days on ${formattedExpiryDate}.\n\nPlease renew your subscription to continue enjoying our services.\n\nBest regards,\nRoyal Fitness Team`,
     joining_date: joiningDate,
+    expiry_date: formattedExpiryDate,
+    remaining_days: daysLeft.toString(),
+    gym_name: "Royal Fitness Gym",
     sameer: "Royal Fitness Gym",
     email: "abhaysam123456@gmail.com"
   };
@@ -142,10 +161,11 @@ export function sendPaymentReminderEmail(
     user_name: "Admin",
     user_email: adminEmail,
     subject: `Membership Expiring Soon - ${member.fullName}`,
-    message: `A member's subscription is expiring soon:\n\nName: ${member.fullName}\nEmail: ${member.email}\nDays Left: ${daysLeft}\nPayment Status: ${member.paymentStatus}`,
+    message: `A member's subscription is expiring soon:\n\nName: ${member.fullName}\nEmail: ${member.email}\nDays Left: ${daysLeft}\nExpiry Date: ${formattedExpiryDate}\nPayment Status: ${member.paymentStatus}`,
     member_name: member.fullName,
     member_email: member.email,
     days_left: daysLeft.toString(),
+    expiry_date: formattedExpiryDate,
     payment: member.paymentStatus,
     sameer: "Royal Fitness Gym",
     email: "abhaysam123456@gmail.com"

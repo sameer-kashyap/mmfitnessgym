@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { Member } from "../types/member";
 import { calculateDaysLeft, generateId, getMemberStatus } from "../lib/utils";
@@ -51,46 +52,105 @@ export function MemberProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  // Function to check for expiring memberships and send reminders
+  const checkExpiringMemberships = () => {
+    if (!emailJSLoaded) return;
+
+    console.log("Checking for expiring memberships...");
+    const updatedMembers = [...members].map(member => {
+      const daysLeft = calculateDaysLeft(member.startDate, member.subscriptionDuration);
+      const memberStatus = getMemberStatus(member);
+      let updatedMember = { ...member };
+
+      // Check specifically for 7, 3, and 1 days left
+      if (memberStatus === 'expiring-soon') {
+        if (daysLeft === 7 && !member.reminderSent.sevenDays) {
+          console.log(`Sending 7-day reminder to ${member.fullName} (${member.email})`);
+          sendPaymentReminderEmail(member, 7)
+            .then(success => {
+              if (success) {
+                console.log(`Successfully sent 7-day reminder to ${member.email}`);
+              }
+            });
+          updatedMember.reminderSent.sevenDays = true;
+        } 
+        
+        if (daysLeft === 3 && !member.reminderSent.threeDays) {
+          console.log(`Sending 3-day reminder to ${member.fullName} (${member.email})`);
+          sendPaymentReminderEmail(member, 3)
+            .then(success => {
+              if (success) {
+                console.log(`Successfully sent 3-day reminder to ${member.email}`);
+              }
+            });
+          updatedMember.reminderSent.threeDays = true;
+        } 
+        
+        if (daysLeft === 1 && !member.reminderSent.oneDay) {
+          console.log(`Sending 1-day reminder to ${member.fullName} (${member.email})`);
+          sendPaymentReminderEmail(member, 1)
+            .then(success => {
+              if (success) {
+                console.log(`Successfully sent 1-day reminder to ${member.email}`);
+              }
+            });
+          updatedMember.reminderSent.oneDay = true;
+        }
+      }
+
+      return updatedMember;
+    });
+
+    // Update members with updated reminder status
+    setMembers(updatedMembers);
+  };
+
+  // Set up scheduled function to check expiring memberships daily
   useEffect(() => {
     if (loading) return;
 
+    // First check immediately when the component loads
+    checkExpiringMemberships();
+
+    // Then set up an interval to check regularly (every hour)
     const interval = setInterval(() => {
-      const updatedMembers = [...members].map(member => {
-        const daysLeft = calculateDaysLeft(member.startDate, member.subscriptionDuration);
-        const memberStatus = getMemberStatus(member);
-        let updatedMember = { ...member };
+      checkExpiringMemberships();
 
-        if (memberStatus === 'expiring-soon') {
-          if (daysLeft === 7 && !member.reminderSent.sevenDays) {
-            sendPaymentReminderEmail(member, 7);
-            updatedMember.reminderSent.sevenDays = true;
-          } else if (daysLeft === 3 && !member.reminderSent.threeDays) {
-            sendPaymentReminderEmail(member, 3);
-            updatedMember.reminderSent.threeDays = true;
-          } else if (daysLeft === 1 && !member.reminderSent.oneDay) {
-            sendPaymentReminderEmail(member, 1);
-            updatedMember.reminderSent.oneDay = true;
-          }
-        }
-
-        return updatedMember;
-      });
-
-      const filteredMembers = updatedMembers.filter(member => {
+      // Also check for expired memberships to remove
+      const filteredMembers = [...members].filter(member => {
         const status = getMemberStatus(member);
         return status !== 'expired';
       });
 
-      if (filteredMembers.length !== updatedMembers.length) {
-        toast.info(`${updatedMembers.length - filteredMembers.length} expired member(s) have been automatically removed.`);
+      if (filteredMembers.length !== members.length) {
+        toast.info(`${members.length - filteredMembers.length} expired member(s) have been automatically removed.`);
+        setMembers(filteredMembers);
       }
+      
+    }, 60 * 60 * 1000); // Check every hour
 
-      setMembers(filteredMembers);
-      localStorage.setItem("gym-members", JSON.stringify(filteredMembers));
-    }, 60000);
+    // Also check once daily at midnight for new day triggers
+    const scheduleDailyCheck = () => {
+      const now = new Date();
+      const night = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate() + 1, // tomorrow
+        0, 0, 0 // at 00:00:00
+      );
+      const timeUntilMidnight = night.getTime() - now.getTime();
+      
+      setTimeout(() => {
+        console.log("Running scheduled midnight membership check");
+        checkExpiringMemberships();
+        scheduleDailyCheck(); // Schedule the next day's check
+      }, timeUntilMidnight);
+    };
+    
+    scheduleDailyCheck();
 
     return () => clearInterval(interval);
-  }, [members, loading]);
+  }, [members, loading, emailJSLoaded]);
 
   useEffect(() => {
     if (!loading) {

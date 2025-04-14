@@ -1,9 +1,12 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { Member } from "../types/member";
-import { calculateDaysLeft, generateId, getMemberStatus } from "../lib/utils";
-import { sendWelcomeEmail, sendPaymentReminderEmail } from "../lib/email";
+import { generateId, getMemberStatus } from "../lib/utils";
+import { sendWelcomeEmail } from "../lib/email";
 import { toast } from "../components/ui/sonner";
+import { useEmailJS } from "../hooks/useEmailJS";
+import { useMembershipCheck } from "../hooks/useMembershipCheck";
+import { useLocalStorage } from "../hooks/useLocalStorage";
 
 type MemberContextType = {
   members: Member[];
@@ -20,143 +23,22 @@ const MemberContext = createContext<MemberContextType | undefined>(undefined);
 export function MemberProvider({ children }: { children: ReactNode }) {
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
-  const [emailJSLoaded, setEmailJSLoaded] = useState(false);
+  const emailJSLoaded = useEmailJS();
 
+  // Initialize members from localStorage
   useEffect(() => {
-    const loadMembers = () => {
-      const savedMembers = localStorage.getItem("gym-members");
-      if (savedMembers) {
-        setMembers(JSON.parse(savedMembers));
-      }
-      setLoading(false);
-    };
-
-    const script = document.createElement("script");
-    script.src = "https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js";
-    script.async = true;
-    script.onload = () => {
-      console.log("EmailJS script loaded");
-      window.emailjs.init("H-8V_wOp5vS_BD8gO");
-      setEmailJSLoaded(true);
-      loadMembers();
-    };
-    script.onerror = () => {
-      console.error("Failed to load EmailJS");
-      toast.error("Failed to load email service");
-      loadMembers();
-    };
-    document.body.appendChild(script);
-
-    return () => {
-      document.body.removeChild(script);
-    };
+    const savedMembers = localStorage.getItem("gym-members");
+    if (savedMembers) {
+      setMembers(JSON.parse(savedMembers));
+    }
+    setLoading(false);
   }, []);
 
-  // Function to check for expiring memberships and send reminders
-  const checkExpiringMemberships = () => {
-    if (!emailJSLoaded) return;
+  // Hook for checking memberships
+  useMembershipCheck(members, emailJSLoaded, setMembers);
 
-    console.log("Checking for expiring memberships...");
-    const updatedMembers = [...members].map(member => {
-      const daysLeft = calculateDaysLeft(member.startDate, member.subscriptionDuration);
-      const memberStatus = getMemberStatus(member);
-      let updatedMember = { ...member };
-
-      // Check specifically for 7, 3, and 1 days left
-      if (memberStatus === 'expiring-soon') {
-        if (daysLeft === 7 && !member.reminderSent.sevenDays) {
-          console.log(`Sending 7-day reminder to ${member.fullName} (${member.email})`);
-          sendPaymentReminderEmail(member, 7)
-            .then(success => {
-              if (success) {
-                console.log(`Successfully sent 7-day reminder to ${member.email}`);
-              }
-            });
-          updatedMember.reminderSent.sevenDays = true;
-        } 
-        
-        if (daysLeft === 3 && !member.reminderSent.threeDays) {
-          console.log(`Sending 3-day reminder to ${member.fullName} (${member.email})`);
-          sendPaymentReminderEmail(member, 3)
-            .then(success => {
-              if (success) {
-                console.log(`Successfully sent 3-day reminder to ${member.email}`);
-              }
-            });
-          updatedMember.reminderSent.threeDays = true;
-        } 
-        
-        if (daysLeft === 1 && !member.reminderSent.oneDay) {
-          console.log(`Sending 1-day reminder to ${member.fullName} (${member.email})`);
-          sendPaymentReminderEmail(member, 1)
-            .then(success => {
-              if (success) {
-                console.log(`Successfully sent 1-day reminder to ${member.email}`);
-              }
-            });
-          updatedMember.reminderSent.oneDay = true;
-        }
-      }
-
-      return updatedMember;
-    });
-
-    // Update members with updated reminder status
-    setMembers(updatedMembers);
-  };
-
-  // Set up scheduled function to check expiring memberships daily
-  useEffect(() => {
-    if (loading) return;
-
-    // First check immediately when the component loads
-    checkExpiringMemberships();
-
-    // Then set up an interval to check regularly (every hour)
-    const interval = setInterval(() => {
-      checkExpiringMemberships();
-
-      // Also check for expired memberships to remove
-      const filteredMembers = [...members].filter(member => {
-        const status = getMemberStatus(member);
-        return status !== 'expired';
-      });
-
-      if (filteredMembers.length !== members.length) {
-        toast.info(`${members.length - filteredMembers.length} expired member(s) have been automatically removed.`);
-        setMembers(filteredMembers);
-      }
-      
-    }, 60 * 60 * 1000); // Check every hour
-
-    // Also check once daily at midnight for new day triggers
-    const scheduleDailyCheck = () => {
-      const now = new Date();
-      const night = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate() + 1, // tomorrow
-        0, 0, 0 // at 00:00:00
-      );
-      const timeUntilMidnight = night.getTime() - now.getTime();
-      
-      setTimeout(() => {
-        console.log("Running scheduled midnight membership check");
-        checkExpiringMemberships();
-        scheduleDailyCheck(); // Schedule the next day's check
-      }, timeUntilMidnight);
-    };
-    
-    scheduleDailyCheck();
-
-    return () => clearInterval(interval);
-  }, [members, loading, emailJSLoaded]);
-
-  useEffect(() => {
-    if (!loading) {
-      localStorage.setItem("gym-members", JSON.stringify(members));
-    }
-  }, [members, loading]);
+  // Hook for localStorage sync
+  useLocalStorage(members, loading);
 
   const addMember = (memberData: Omit<Member, "id" | "startDate" | "reminderSent">) => {
     const newMember: Member = {
@@ -172,8 +54,8 @@ export function MemberProvider({ children }: { children: ReactNode }) {
 
     setMembers(prev => [...prev, newMember]);
     
-    console.log("Attempting to send welcome email to:", newMember.email);
     if (emailJSLoaded) {
+      console.log("Attempting to send welcome email to:", newMember.email);
       sendWelcomeEmail(newMember)
         .then(success => {
           if (!success) {

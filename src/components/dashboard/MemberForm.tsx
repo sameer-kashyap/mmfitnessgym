@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useMembers } from "../../context/MemberContext";
 import { Button } from "../ui/button";
@@ -144,20 +143,16 @@ const MemberForm: React.FC = () => {
           
           <div className="space-y-2">
             <Label htmlFor="subscriptionDuration">Subscription (Days)</Label>
-            <Select 
+            <Input
+              id="subscriptionDuration"
+              name="subscriptionDuration"
+              type="number"
+              min="1"
+              max="365"
               value={formData.subscriptionDuration}
-              onValueChange={(value) => handleSelectChange('subscriptionDuration', value)}
-            >
-              <SelectTrigger id="subscriptionDuration">
-                <SelectValue placeholder="Select duration" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="30">30 days</SelectItem>
-                <SelectItem value="90">90 days</SelectItem>
-                <SelectItem value="180">180 days</SelectItem>
-                <SelectItem value="365">365 days</SelectItem>
-              </SelectContent>
-            </Select>
+              onChange={handleChange}
+              className="w-full"
+            />
           </div>
           
           <div className="space-y-2">

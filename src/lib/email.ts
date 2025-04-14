@@ -1,10 +1,10 @@
-
 import { type Member } from "../types/member";
 import { toast } from "../components/ui/sonner";
 
 // EmailJS credentials
 const serviceId = "service_s3ek2ky";
-const userTemplateId = "template_saaskwi"; // Template for user emails
+const userTemplateId = "template_1nv590n"; // Template for user welcome emails
+const expiryTemplateId = "template_saaskwi"; // Template for expiry reminders
 const adminTemplateId = "template_1nv590n"; // Template for admin emails
 const publicKey = "H-8V_wOp5vS_BD8gO";
 const adminEmail = "{{from_email}}"; // Admin email placeholder that EmailJS will replace
@@ -24,7 +24,7 @@ interface EmailParams {
 }
 
 // This function sends an email to the member
-export async function sendEmail(params: EmailParams, isAdminNotification = false): Promise<boolean> {
+export async function sendEmail(params: EmailParams, isAdminNotification = false, isExpiryReminder = false): Promise<boolean> {
   try {
     // Check if emailjs is available
     if (!window.emailjs) {
@@ -34,7 +34,14 @@ export async function sendEmail(params: EmailParams, isAdminNotification = false
     }
     
     // Select the appropriate template
-    const templateId = isAdminNotification ? adminTemplateId : userTemplateId;
+    let templateId;
+    if (isAdminNotification) {
+      templateId = adminTemplateId;
+    } else if (isExpiryReminder) {
+      templateId = expiryTemplateId;
+    } else {
+      templateId = userTemplateId;
+    }
     
     // Ensure required template parameters are set
     const emailParams = {
@@ -44,9 +51,8 @@ export async function sendEmail(params: EmailParams, isAdminNotification = false
       gym_name: "Royal Fitness Gym",
     };
     
-    console.log(`Sending email with ${isAdminNotification ? 'admin' : 'user'} template:`, emailParams);
+    console.log(`Sending email with template ${templateId}:`, emailParams);
     
-    // Send email using the selected template
     const response = await window.emailjs.send(
       serviceId,
       templateId,
@@ -65,7 +71,7 @@ export async function sendEmail(params: EmailParams, isAdminNotification = false
         timestamp: new Date().toISOString(),
         recipient: isAdminNotification ? adminEmail : params.user_email,
         subject: params.subject,
-        template: isAdminNotification ? 'admin' : 'user',
+        template: isAdminNotification ? 'admin' : (isExpiryReminder ? 'expiry' : 'welcome'),
         status: 'sent'
       });
       localStorage.setItem('sent-emails', JSON.stringify(sentEmails));
@@ -142,7 +148,7 @@ export function sendPaymentReminderEmail(
   const expiryDate = new Date(new Date(member.startDate).getTime() + (member.subscriptionDuration * 24 * 60 * 60 * 1000));
   const formattedExpiryDate = expiryDate.toLocaleDateString();
   
-  // Send reminder to member
+  // Send reminder to member with isExpiryReminder flag set to true
   const memberParams: EmailParams = {
     user_name: member.fullName,
     user_email: member.email,
@@ -173,8 +179,8 @@ export function sendPaymentReminderEmail(
   
   console.log("Sending reminder email to:", member.email);
   
-  // First send to member, then to admin
-  return sendEmail(memberParams).then(memberSuccess => {
+  // First send to member with isExpiryReminder flag, then to admin
+  return sendEmail(memberParams, false, true).then(memberSuccess => {
     if (memberSuccess) {
       console.log("Sending admin notification about expiring membership");
       return sendEmail(adminParams, true);

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useMembers } from "../../context/MemberContext";
 import { Button } from "../ui/button";
@@ -16,7 +15,7 @@ import { toast } from "../ui/sonner";
 import { Calendar } from "../ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
+import { parse, isValid, format } from "date-fns";
 import { cn } from "@/lib/utils";
 
 const MemberForm: React.FC = () => {
@@ -27,7 +26,7 @@ const MemberForm: React.FC = () => {
     phone: "",
     subscriptionDuration: "30",
     paymentStatus: "paid",
-    dateOfBirth: undefined as Date | undefined
+    dateOfBirth: ""
   });
 
   const [formErrors, setFormErrors] = useState({
@@ -51,20 +50,28 @@ const MemberForm: React.FC = () => {
     }
   };
 
+  const handleDateOfBirthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setFormData(prev => ({ ...prev, dateOfBirth: value }));
+    setFormErrors(prev => ({ ...prev, dateOfBirth: false }));
+  };
+
   const handleSelectChange = (name: string, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleDateSelect = (date: Date | undefined) => {
-    setFormData(prev => ({ ...prev, dateOfBirth: date }));
-    setFormErrors(prev => ({ ...prev, dateOfBirth: false }));
+  const validateDateOfBirth = (dateString: string): boolean => {
+    const parsedDate = parse(dateString, 'dd/MM/yyyy', new Date());
+    return isValid(parsedDate) && 
+           parsedDate < new Date() && 
+           parsedDate > new Date('1900-01-01');
   };
 
   const validateForm = (): boolean => {
     const newFormErrors = {
       fullName: formData.fullName.trim() === "",
       phone: !validatePhone(formData.phone),
-      dateOfBirth: !formData.dateOfBirth
+      dateOfBirth: !validateDateOfBirth(formData.dateOfBirth)
     };
     
     setFormErrors(newFormErrors);
@@ -79,21 +86,22 @@ const MemberForm: React.FC = () => {
       return;
     }
     
+    const parsedDate = parse(formData.dateOfBirth, 'dd/MM/yyyy', new Date());
+    
     addMember({
       fullName: formData.fullName.trim(),
       phone: formData.phone.trim(),
       subscriptionDuration: parseInt(formData.subscriptionDuration),
       paymentStatus: formData.paymentStatus as 'paid' | 'unpaid',
-      dateOfBirth: formData.dateOfBirth ? format(formData.dateOfBirth, 'yyyy-MM-dd') : undefined
+      dateOfBirth: format(parsedDate, 'yyyy-MM-dd')
     });
     
-    // Reset form
     setFormData({
       fullName: "",
       phone: "",
       subscriptionDuration: "30",
       paymentStatus: "paid",
-      dateOfBirth: undefined
+      dateOfBirth: ""
     });
   };
 
@@ -119,40 +127,22 @@ const MemberForm: React.FC = () => {
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="dateOfBirth">Date of Birth</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !formData.dateOfBirth && "text-muted-foreground",
-                    formErrors.dateOfBirth && "border-red-500"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {formData.dateOfBirth ? (
-                    format(formData.dateOfBirth, "PPP")
-                  ) : (
-                    <span>Pick a date</span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={formData.dateOfBirth}
-                  onSelect={handleDateSelect}
-                  initialFocus
-                  disabled={(date) =>
-                    date > new Date() || date < new Date("1900-01-01")
-                  }
-                  className={cn("p-3 pointer-events-auto")}
-                />
-              </PopoverContent>
-            </Popover>
+            <Label htmlFor="dateOfBirth">Date of Birth (DD/MM/YYYY)</Label>
+            <Input
+              id="dateOfBirth"
+              name="dateOfBirth"
+              placeholder="DD/MM/YYYY"
+              value={formData.dateOfBirth}
+              onChange={handleDateOfBirthChange}
+              className={cn(
+                "w-full",
+                formErrors.dateOfBirth ? "border-red-500" : ""
+              )}
+            />
             {formErrors.dateOfBirth && (
-              <p className="text-red-500 text-sm">Date of birth is required</p>
+              <p className="text-red-500 text-sm">
+                Please enter a valid date of birth in DD/MM/YYYY format
+              </p>
             )}
           </div>
           

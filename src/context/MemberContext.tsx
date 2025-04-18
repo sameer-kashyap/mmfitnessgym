@@ -2,7 +2,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { Member } from "../types/member";
 import { generateId, getMemberStatus } from "../lib/utils";
-import { sendWelcomeEmail } from "../lib/email";
 import { toast } from "../components/ui/sonner";
 import { useEmailJS } from "../hooks/useEmailJS";
 import { useMembershipCheck } from "../hooks/useMembershipCheck";
@@ -10,7 +9,7 @@ import { useLocalStorage } from "../hooks/useLocalStorage";
 
 type MemberContextType = {
   members: Member[];
-  addMember: (member: Omit<Member, "id" | "startDate" | "reminderSent">) => void;
+  addMember: (member: Omit<Member, "id" | "startDate" | "reminderSent" | "email">) => void;
   removeMember: (id: string) => void;
   getMember: (id: string) => Member | undefined;
   updateMember: (id: string, member: Partial<Member>) => void;
@@ -40,7 +39,7 @@ export function MemberProvider({ children }: { children: ReactNode }) {
   // Hook for localStorage sync
   useLocalStorage(members, loading);
 
-  const addMember = (memberData: Omit<Member, "id" | "startDate" | "reminderSent">) => {
+  const addMember = (memberData: Omit<Member, "id" | "startDate" | "reminderSent" | "email">) => {
     const newMember: Member = {
       ...memberData,
       id: generateId(),
@@ -53,19 +52,6 @@ export function MemberProvider({ children }: { children: ReactNode }) {
     };
 
     setMembers(prev => [...prev, newMember]);
-    
-    if (emailJSLoaded) {
-      console.log("Attempting to send welcome email to:", newMember.email);
-      sendWelcomeEmail(newMember)
-        .then(success => {
-          if (!success) {
-            console.error("Failed to send welcome email");
-          }
-        });
-    } else {
-      console.error("EmailJS not loaded, can't send welcome email");
-      toast.error("Email service not ready, welcome email could not be sent");
-    }
     
     toast.success(`${newMember.fullName} has been added as a member`);
   };

@@ -6,7 +6,13 @@ export interface Member {
   startDate: string;
   subscriptionDuration: number;
   paymentStatus: 'paid' | 'unpaid';
-  dateOfBirth?: string; // Adding dateOfBirth field
+  dateOfBirth?: string;
+  email?: string; // Make email optional as we're phasing it out
+  reminderSent?: {
+    sevenDays: boolean;
+    threeDays: boolean;
+    oneDay: boolean;
+  };
 }
 
 export type MemberStatus = 'active' | 'expired' | 'expiring-soon' | 'grace-period';

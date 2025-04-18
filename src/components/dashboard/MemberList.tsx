@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from "react";
 import { useMembers } from "../../context/MemberContext";
 import MemberCard from "./MemberCard";
@@ -59,7 +58,6 @@ const MemberList: React.FC = () => {
   const displayMembers = getFilteredMembers(activeTab);
 
   const exportToCSV = () => {
-    // Get the currently displayed members based on active tab and search
     const membersToExport = getFilteredMembers(activeTab);
     
     if (membersToExport.length === 0) {
@@ -67,7 +65,6 @@ const MemberList: React.FC = () => {
       return;
     }
     
-    // Define CSV headers
     const headers = [
       "Full Name",
       "Phone Number",
@@ -77,7 +74,6 @@ const MemberList: React.FC = () => {
       "Payment Status"
     ];
     
-    // Format data for CSV
     const csvData = membersToExport.map(member => {
       const daysLeft = calculateDaysLeft(member.startDate, member.subscriptionDuration);
       const endDate = new Date(new Date(member.startDate).getTime() + (member.subscriptionDuration * 24 * 60 * 60 * 1000));
@@ -92,22 +88,18 @@ const MemberList: React.FC = () => {
       ];
     });
     
-    // Combine headers and data
     const csvContent = [
       headers.join(","),
       ...csvData.map(row => row.join(","))
     ].join("\n");
     
-    // Create a blob with the CSV data
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     
-    // Create a download link and trigger the download
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
     
-    // Get current date for filename
     const today = new Date();
-    const dateStr = today.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+    const dateStr = today.toISOString().split('T')[0];
     
     link.setAttribute("href", url);
     link.setAttribute("download", `mm-fitness-members-${dateStr}.csv`);
@@ -139,10 +131,8 @@ const MemberList: React.FC = () => {
       return;
     }
     
-    // Assuming first line is headers
     const headers = lines[0].split(',').map(h => h.trim());
     
-    // Find the indexes of the required columns
     const nameIndex = headers.findIndex(h => h.toLowerCase().includes('name'));
     const phoneIndex = headers.findIndex(h => h.toLowerCase().includes('phone'));
     const durationIndex = headers.findIndex(h => 
@@ -155,7 +145,6 @@ const MemberList: React.FC = () => {
       h.toLowerCase().includes('status')
     );
 
-    // Validate that we have the required columns
     if (phoneIndex === -1 || durationIndex === -1) {
       toast.error("CSV is missing required columns. Need at least Phone and Subscription Duration.");
       return;
@@ -164,13 +153,11 @@ const MemberList: React.FC = () => {
     const parsedMembers: any[] = [];
     const errors: string[] = [];
 
-    // Start from index 1 to skip the header
     for (let i = 1; i < lines.length; i++) {
-      if (!lines[i].trim()) continue; // Skip empty lines
+      if (!lines[i].trim()) continue;
       
       const values = lines[i].split(',').map(v => v.trim());
       
-      // Extract values (using defaults if columns are missing)
       const fullName = nameIndex !== -1 ? values[nameIndex] : `Member ${i}`;
       const phone = phoneIndex !== -1 ? values[phoneIndex] : '';
       const durationStr = durationIndex !== -1 ? values[durationIndex] : '';
@@ -178,7 +165,6 @@ const MemberList: React.FC = () => {
         ? values[paymentStatusIndex].toLowerCase() === 'paid' ? 'paid' : 'unpaid'
         : 'unpaid';
       
-      // Validate phone and duration
       if (!phone || phone.length < 10) {
         errors.push(`Row ${i}: Invalid phone number`);
         continue;
@@ -189,8 +175,6 @@ const MemberList: React.FC = () => {
         errors.push(`Row ${i}: Invalid subscription duration (must be 1-365)`);
         continue;
       }
-      
-      // Phone number uniqueness check handled during import confirmation
       
       parsedMembers.push({
         fullName,
@@ -204,7 +188,6 @@ const MemberList: React.FC = () => {
     setImportErrors(errors);
     setIsImportDialogOpen(true);
 
-    // Reset file input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -214,7 +197,6 @@ const MemberList: React.FC = () => {
     let importedCount = 0;
     let duplicateCount = 0;
     
-    // Check for unique phone numbers in existing members
     const existingPhones = new Set(allMembers.map(m => m.phone));
     
     importedMembers.forEach(member => {
@@ -223,12 +205,11 @@ const MemberList: React.FC = () => {
       } else {
         addMember({
           fullName: member.fullName,
-          email: "", // Email is no longer used
           phone: member.phone,
           subscriptionDuration: member.subscriptionDuration,
           paymentStatus: member.paymentStatus
         });
-        existingPhones.add(member.phone); // Add to set to prevent duplicates
+        existingPhones.add(member.phone);
         importedCount++;
       }
     });
@@ -353,7 +334,6 @@ const MemberList: React.FC = () => {
         ))}
       </Tabs>
       
-      {/* CSV Import Preview Dialog */}
       <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
         <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
@@ -416,7 +396,6 @@ const MemberList: React.FC = () => {
         </DialogContent>
       </Dialog>
       
-      {/* CSV Drop Zone Overlay (hidden by default) */}
       <div
         onDragOver={dragOver}
         onDragEnter={dragEnter}

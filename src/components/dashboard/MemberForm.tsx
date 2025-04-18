@@ -13,6 +13,11 @@ import {
   SelectValue 
 } from "../ui/select";
 import { toast } from "../ui/sonner";
+import { Calendar } from "../ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 const MemberForm: React.FC = () => {
   const { addMember } = useMembers();
@@ -20,13 +25,15 @@ const MemberForm: React.FC = () => {
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
-    subscriptionDuration: "30", // Default to 30 days
-    paymentStatus: "paid"
+    subscriptionDuration: "30",
+    paymentStatus: "paid",
+    dateOfBirth: undefined as Date | undefined
   });
 
   const [formErrors, setFormErrors] = useState({
     fullName: false,
-    phone: false
+    phone: false,
+    dateOfBirth: false
   });
 
   const validatePhone = (phone: string): boolean => {
@@ -48,10 +55,16 @@ const MemberForm: React.FC = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleDateSelect = (date: Date | undefined) => {
+    setFormData(prev => ({ ...prev, dateOfBirth: date }));
+    setFormErrors(prev => ({ ...prev, dateOfBirth: false }));
+  };
+
   const validateForm = (): boolean => {
     const newFormErrors = {
       fullName: formData.fullName.trim() === "",
-      phone: !validatePhone(formData.phone)
+      phone: !validatePhone(formData.phone),
+      dateOfBirth: !formData.dateOfBirth
     };
     
     setFormErrors(newFormErrors);
@@ -68,10 +81,10 @@ const MemberForm: React.FC = () => {
     
     addMember({
       fullName: formData.fullName.trim(),
-      email: "", // Empty email as it's no longer required
       phone: formData.phone.trim(),
       subscriptionDuration: parseInt(formData.subscriptionDuration),
-      paymentStatus: formData.paymentStatus as 'paid' | 'unpaid'
+      paymentStatus: formData.paymentStatus as 'paid' | 'unpaid',
+      dateOfBirth: formData.dateOfBirth ? format(formData.dateOfBirth, 'yyyy-MM-dd') : undefined
     });
     
     // Reset form
@@ -79,7 +92,8 @@ const MemberForm: React.FC = () => {
       fullName: "",
       phone: "",
       subscriptionDuration: "30",
-      paymentStatus: "paid"
+      paymentStatus: "paid",
+      dateOfBirth: undefined
     });
   };
 
@@ -101,6 +115,44 @@ const MemberForm: React.FC = () => {
             />
             {formErrors.fullName && (
               <p className="text-red-500 text-sm">Name is required</p>
+            )}
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="dateOfBirth">Date of Birth</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !formData.dateOfBirth && "text-muted-foreground",
+                    formErrors.dateOfBirth && "border-red-500"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {formData.dateOfBirth ? (
+                    format(formData.dateOfBirth, "PPP")
+                  ) : (
+                    <span>Pick a date</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={formData.dateOfBirth}
+                  onSelect={handleDateSelect}
+                  initialFocus
+                  disabled={(date) =>
+                    date > new Date() || date < new Date("1900-01-01")
+                  }
+                  className={cn("p-3 pointer-events-auto")}
+                />
+              </PopoverContent>
+            </Popover>
+            {formErrors.dateOfBirth && (
+              <p className="text-red-500 text-sm">Date of birth is required</p>
             )}
           </div>
           

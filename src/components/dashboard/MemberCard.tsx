@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader } from "../ui/card";
 import { Button } from "../ui/button";
 import { calculateDaysLeft, formatDate } from "../../lib/utils";
 import { Trash2 } from "lucide-react";
+import { EditMemberDialog } from "./member-form/EditMemberDialog";
 
 interface MemberCardProps {
   member: Member;
@@ -31,14 +32,17 @@ const MemberCard: React.FC<MemberCardProps> = ({ member }) => {
             <h3 className="text-lg font-semibold">{member.fullName}</h3>
             <p className="text-sm text-muted-foreground">{member.phone}</p>
           </div>
-          <Button 
-            variant="destructive" 
-            size="icon"
-            className="h-8 w-8 p-0"
-            onClick={() => removeMember(member.id)}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          <div className="flex gap-2">
+            <EditMemberDialog member={member} />
+            <Button 
+              variant="destructive" 
+              size="icon"
+              className="h-8 w-8 p-0"
+              onClick={() => removeMember(member.id)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent>

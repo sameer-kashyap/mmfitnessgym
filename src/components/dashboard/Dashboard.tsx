@@ -1,10 +1,12 @@
+
 import React from "react";
 import { Separator } from "../ui/separator";
 import MemberForm from "./MemberForm";
 import MemberList from "./MemberList";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { useMembers } from "../../context/MemberContext";
-import { Dumbbell, UserCheck, Clock, AlertTriangle } from "lucide-react";
+import { UserCheck, Clock, AlertTriangle } from "lucide-react";
+
 const Dashboard: React.FC = () => {
   const {
     filteredMembers
@@ -18,10 +20,10 @@ const Dashboard: React.FC = () => {
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-royal-purple">Royal Fitness Gym</h1>
+            <h1 className="text-3xl font-bold text-royal-purple">MM Fitness</h1>
             <p className="text-muted-foreground">Member Management Dashboard</p>
           </div>
-          <Dumbbell className="h-10 w-10 text-royal-purple" strokeWidth={1.5} />
+          <img src="/lovable-uploads/988c260d-5fb3-4221-baf8-10d17709045b.png" alt="MM Fitness Logo" className="h-16 w-auto" />
         </div>
         
         <Separator />

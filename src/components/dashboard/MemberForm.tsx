@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useMembers } from "../../context/MemberContext";
 import { Button } from "../ui/button";
@@ -18,7 +19,6 @@ const MemberForm: React.FC = () => {
 
   const [formData, setFormData] = useState({
     fullName: "",
-    email: "",
     phone: "",
     subscriptionDuration: "30", // Default to 30 days
     paymentStatus: "paid"
@@ -26,14 +26,8 @@ const MemberForm: React.FC = () => {
 
   const [formErrors, setFormErrors] = useState({
     fullName: false,
-    email: false,
     phone: false
   });
-
-  const validateEmail = (email: string): boolean => {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
-  };
 
   const validatePhone = (phone: string): boolean => {
     const re = /^[0-9\-\+\s\(\)]{10,15}$/;
@@ -57,7 +51,6 @@ const MemberForm: React.FC = () => {
   const validateForm = (): boolean => {
     const newFormErrors = {
       fullName: formData.fullName.trim() === "",
-      email: !validateEmail(formData.email),
       phone: !validatePhone(formData.phone)
     };
     
@@ -75,7 +68,7 @@ const MemberForm: React.FC = () => {
     
     addMember({
       fullName: formData.fullName.trim(),
-      email: formData.email.trim(),
+      email: "", // Empty email as it's no longer required
       phone: formData.phone.trim(),
       subscriptionDuration: parseInt(formData.subscriptionDuration),
       paymentStatus: formData.paymentStatus as 'paid' | 'unpaid'
@@ -84,7 +77,6 @@ const MemberForm: React.FC = () => {
     // Reset form
     setFormData({
       fullName: "",
-      email: "",
       phone: "",
       subscriptionDuration: "30",
       paymentStatus: "paid"
@@ -109,21 +101,6 @@ const MemberForm: React.FC = () => {
             />
             {formErrors.fullName && (
               <p className="text-red-500 text-sm">Name is required</p>
-            )}
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="email">Email Address</Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              className={formErrors.email ? "border-red-500" : ""}
-            />
-            {formErrors.email && (
-              <p className="text-red-500 text-sm">Valid email is required</p>
             )}
           </div>
           

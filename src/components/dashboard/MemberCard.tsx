@@ -27,7 +27,11 @@ const MemberCard: React.FC<MemberCardProps> = ({ member }) => {
     return "bg-gray-100 text-gray-800 border-gray-200";
   };
 
-  const handleCardClick = () => {
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Only open profile if the click is on the card itself, not on buttons
+    if ((e.target as HTMLElement).closest('button')) {
+      return;
+    }
     setIsProfileOpen(true);
   };
 

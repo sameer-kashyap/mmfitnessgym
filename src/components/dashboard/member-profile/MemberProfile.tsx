@@ -10,7 +10,6 @@ import {
 import { format } from "date-fns";
 import { formatDate } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
-import { EditMemberDialog } from "../member-form/EditMemberDialog";
 
 interface MemberProfileProps {
   member: Member;
@@ -25,10 +24,7 @@ export const MemberProfile = ({ member, isOpen, setIsOpen }: MemberProfileProps)
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="max-w-[600px] p-6">
         <DialogHeader>
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-2xl">{member.fullName}</DialogTitle>
-            <EditMemberDialog member={member} />
-          </div>
+          <DialogTitle className="text-2xl">{member.fullName}</DialogTitle>
         </DialogHeader>
         
         <div className="mt-6 space-y-6">

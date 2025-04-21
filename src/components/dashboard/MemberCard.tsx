@@ -24,8 +24,12 @@ const MemberCard: React.FC<MemberCardProps> = ({ member }) => {
     return "status-unpaid";
   };
 
+  // Calculate days since expiration
+  const daysSinceExpired = daysLeft < 0 ? Math.abs(daysLeft) : 0;
+  const showExpiredBadge = daysLeft < 0;
+
   return (
-    <Card className="gym-card relative">
+    <Card className="gym-card relative overflow-visible">
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
           <div>
@@ -56,6 +60,16 @@ const MemberCard: React.FC<MemberCardProps> = ({ member }) => {
             <span>Subscription ends:</span>
             <span>{formatDate(endDate.toISOString())}</span>
           </div>
+          {showExpiredBadge && (
+            <div className="mt-1 flex items-center">
+              <span
+                className="inline-block rounded-full px-3 py-1 text-xs font-semibold bg-[#ea384c] text-white animate-pulse shadow"
+                aria-label={`Expired: ${daysSinceExpired} days ago`}
+              >
+                Expired: {daysSinceExpired} day{daysSinceExpired !== 1 && "s"} ago
+              </span>
+            </div>
+          )}
           <div className="flex justify-between items-center">
             <span className={`status-badge ${getStatusClass()}`}>
               {daysLeft > 0 ? `${daysLeft} days left` : "Expired"}
@@ -71,3 +85,4 @@ const MemberCard: React.FC<MemberCardProps> = ({ member }) => {
 };
 
 export default MemberCard;
+

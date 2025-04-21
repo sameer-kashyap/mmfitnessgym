@@ -1,4 +1,3 @@
-
 export interface Member {
   id: string;
   fullName: string;
@@ -7,6 +6,8 @@ export interface Member {
   subscriptionDuration: number;
   paymentStatus: 'paid' | 'unpaid';
   dateOfBirth?: string;
+  deposit?: number;
+  due?: number;
   email?: string; // Make email optional as we're phasing it out
   reminderSent?: {
     sevenDays: boolean;

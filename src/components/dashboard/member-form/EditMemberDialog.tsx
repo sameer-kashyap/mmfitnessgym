@@ -12,7 +12,15 @@ import {
 import { FormField } from "./FormField";
 import { PaymentStatusSelect } from "./PaymentStatusSelect";
 import { useEditMember } from "@/hooks/useEditMember";
-import { Pencil } from "lucide-react";
+import { Pencil, Calendar } from "lucide-react";
+import { format } from "date-fns";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 interface EditMemberDialogProps {
   member: Member;
@@ -27,6 +35,8 @@ export const EditMemberDialog = ({ member }: EditMemberDialogProps) => {
     handleChange,
     handleSelectChange,
     handleSubmit,
+    selectedDate,
+    setSelectedDate,
   } = useEditMember(member);
 
   return (
@@ -65,10 +75,68 @@ export const EditMemberDialog = ({ member }: EditMemberDialogProps) => {
             type="number"
           />
 
+          <div className="space-y-2">
+            <FormField
+              label="Deposit Paid (₹)"
+              id="deposit"
+              name="deposit"
+              value={formData.deposit}
+              onChange={handleChange}
+              type="number"
+              placeholder="Enter deposit amount"
+            />
+
+            <FormField
+              label="Amount Due (₹)"
+              id="due"
+              name="due"
+              value={formData.due}
+              onChange={handleChange}
+              type="number"
+              placeholder="Enter due amount"
+            />
+          </div>
+
           <PaymentStatusSelect
             value={formData.paymentStatus}
             onChange={(value) => handleSelectChange('paymentStatus', value)}
           />
+
+          {!member.dateOfBirth && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Date of Birth</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !selectedDate && "text-muted-foreground"
+                    )}
+                  >
+                    <Calendar className="mr-2 h-4 w-4" />
+                    {selectedDate ? (
+                      format(selectedDate, "PPP")
+                    ) : (
+                      <span>Pick a date</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <CalendarComponent
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={setSelectedDate}
+                    initialFocus
+                    disabled={(date) =>
+                      date > new Date() || date < new Date("1900-01-01")
+                    }
+                    className={cn("p-3 pointer-events-auto")}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+          )}
 
           <DialogFooter>
             <Button

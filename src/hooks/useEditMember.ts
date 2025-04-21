@@ -8,6 +8,8 @@ interface EditFormData {
   phone: string;
   subscriptionDuration: string;
   paymentStatus: string;
+  deposit: string;
+  due: string;
 }
 
 interface EditFormErrors {
@@ -17,10 +19,15 @@ interface EditFormErrors {
 export const useEditMember = (member: Member) => {
   const { updateMember } = useMembers();
   const [isOpen, setIsOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
+    member.dateOfBirth ? new Date(member.dateOfBirth) : undefined
+  );
   const [formData, setFormData] = useState<EditFormData>({
     phone: member.phone,
     subscriptionDuration: member.subscriptionDuration.toString(),
     paymentStatus: member.paymentStatus,
+    deposit: member.deposit?.toString() || "0",
+    due: member.due?.toString() || "0",
   });
   const [formErrors, setFormErrors] = useState<EditFormErrors>({
     phone: false,
@@ -68,6 +75,9 @@ export const useEditMember = (member: Member) => {
       phone: formData.phone.trim(),
       subscriptionDuration: parseInt(formData.subscriptionDuration),
       paymentStatus: formData.paymentStatus as 'paid' | 'unpaid',
+      deposit: parseFloat(formData.deposit) || 0,
+      due: parseFloat(formData.due) || 0,
+      dateOfBirth: selectedDate ? selectedDate.toISOString().split('T')[0] : undefined,
       ...(resetStartDate && { startDate: new Date().toISOString() })
     });
     
@@ -83,5 +93,7 @@ export const useEditMember = (member: Member) => {
     handleChange,
     handleSelectChange,
     handleSubmit,
+    selectedDate,
+    setSelectedDate,
   };
 };

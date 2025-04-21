@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Member } from "../../types/member";
 import { useMembers } from "../../context/MemberContext";
@@ -26,11 +27,15 @@ const MemberCard: React.FC<MemberCardProps> = ({ member }) => {
     return "bg-gray-100 text-gray-800 border-gray-200";
   };
 
+  const handleCardClick = () => {
+    setIsProfileOpen(true);
+  };
+
   return (
     <>
       <Card 
         className="gym-card relative overflow-visible cursor-pointer hover:shadow-md transition-shadow"
-        onClick={() => setIsProfileOpen(true)}
+        onClick={handleCardClick}
       >
         <CardHeader className="pb-2">
           <div className="flex justify-between items-start">
@@ -44,7 +49,10 @@ const MemberCard: React.FC<MemberCardProps> = ({ member }) => {
                 variant="destructive" 
                 size="icon"
                 className="h-8 w-8 p-0"
-                onClick={() => removeMember(member.id)}
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent card click event
+                  removeMember(member.id);
+                }}
               >
                 <Trash2 className="h-4 w-4" />
               </Button>

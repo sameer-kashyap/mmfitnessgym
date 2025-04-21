@@ -12,15 +12,7 @@ import {
 import { FormField } from "./FormField";
 import { PaymentStatusSelect } from "./PaymentStatusSelect";
 import { useEditMember } from "@/hooks/useEditMember";
-import { Pencil, Calendar } from "lucide-react";
-import { format } from "date-fns";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
+import { Pencil } from "lucide-react";
 
 interface EditMemberDialogProps {
   member: Member;
@@ -35,15 +27,15 @@ export const EditMemberDialog = ({ member }: EditMemberDialogProps) => {
     handleChange,
     handleSelectChange,
     handleSubmit,
-    selectedDate,
-    setSelectedDate,
+    dateOfBirth,
+    setDateOfBirth,
   } = useEditMember(member);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <Button
         onClick={(e) => {
-          e.stopPropagation();
+          e.stopPropagation(); // Prevent opening profile
           setIsOpen(true);
         }}
         variant="outline"
@@ -109,37 +101,14 @@ export const EditMemberDialog = ({ member }: EditMemberDialogProps) => {
 
           {!member.dateOfBirth && (
             <div className="space-y-2">
-              <label className="text-sm font-medium">Date of Birth</label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant={"outline"}
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !selectedDate && "text-muted-foreground"
-                    )}
-                  >
-                    <Calendar className="mr-2 h-4 w-4" />
-                    {selectedDate ? (
-                      format(selectedDate, "dd/MM/yyyy")
-                    ) : (
-                      <span>Pick a date</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <CalendarComponent
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={setSelectedDate}
-                    initialFocus
-                    disabled={(date) =>
-                      date > new Date() || date < new Date("1900-01-01")
-                    }
-                    className={cn("p-3 pointer-events-auto")}
-                  />
-                </PopoverContent>
-              </Popover>
+              <FormField
+                label="Date of Birth (DD/MM/YYYY)"
+                id="dateOfBirth"
+                name="dateOfBirth"
+                value={dateOfBirth}
+                onChange={(e) => setDateOfBirth(e.target.value)}
+                placeholder="DD/MM/YYYY"
+              />
             </div>
           )}
 

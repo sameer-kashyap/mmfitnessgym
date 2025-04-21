@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Member } from "@/types/member";
 import { useMembers } from "@/context/MemberContext";
 import { toast } from "@/components/ui/sonner";
-import { format } from "date-fns";
+import { format, parse, isValid } from "date-fns";
 
 interface EditFormData {
   phone: string;
@@ -20,9 +20,12 @@ interface EditFormErrors {
 export const useEditMember = (member: Member) => {
   const { updateMember } = useMembers();
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-    member.dateOfBirth ? new Date(member.dateOfBirth) : undefined
+  const [dateOfBirth, setDateOfBirth] = useState<string>(
+    member.dateOfBirth 
+      ? format(new Date(member.dateOfBirth), "dd/MM/yyyy") 
+      : ""
   );
+  
   const [formData, setFormData] = useState<EditFormData>({
     phone: member.phone,
     subscriptionDuration: member.subscriptionDuration.toString(),
@@ -37,6 +40,14 @@ export const useEditMember = (member: Member) => {
   const validatePhone = (phone: string): boolean => {
     const re = /^[0-9\-\+\s\(\)]{10,15}$/;
     return re.test(phone);
+  };
+
+  const validateDateOfBirth = (dateString: string): boolean => {
+    if (!dateString?.trim()) return true;
+    const parsedDate = parse(dateString, 'dd/MM/yyyy', new Date());
+    return isValid(parsedDate) && 
+           parsedDate < new Date() && 
+           parsedDate > new Date("1900-01-01");
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,6 +69,13 @@ export const useEditMember = (member: Member) => {
     };
     
     setFormErrors(newFormErrors);
+    
+    // Also validate the date of birth if it's provided
+    if (dateOfBirth && !validateDateOfBirth(dateOfBirth)) {
+      toast.error("Please enter a valid date of birth in DD/MM/YYYY format");
+      return false;
+    }
+    
     return !Object.values(newFormErrors).some(error => error);
   };
 
@@ -73,13 +91,21 @@ export const useEditMember = (member: Member) => {
     const resetStartDate = parseInt(formData.subscriptionDuration) !== member.subscriptionDuration;
     const now = new Date();
     
+    let formattedDob = undefined;
+    if (dateOfBirth?.trim()) {
+      const parsedDob = parse(dateOfBirth, 'dd/MM/yyyy', new Date());
+      if (isValid(parsedDob)) {
+        formattedDob = format(parsedDob, "yyyy-MM-dd");
+      }
+    }
+    
     updateMember(member.id, {
       phone: formData.phone.trim(),
       subscriptionDuration: parseInt(formData.subscriptionDuration),
       paymentStatus: formData.paymentStatus as 'paid' | 'unpaid',
       deposit: parseFloat(formData.deposit) || 0,
       due: parseFloat(formData.due) || 0,
-      dateOfBirth: selectedDate ? format(selectedDate, "yyyy-MM-dd") : undefined,
+      dateOfBirth: formattedDob,
       updatedAt: now.toISOString(),
       ...(resetStartDate && { startDate: now.toISOString() })
     });
@@ -96,7 +122,7 @@ export const useEditMember = (member: Member) => {
     handleChange,
     handleSelectChange,
     handleSubmit,
-    selectedDate,
-    setSelectedDate,
+    dateOfBirth,
+    setDateOfBirth,
   };
 };

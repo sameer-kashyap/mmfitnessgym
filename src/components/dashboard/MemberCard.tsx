@@ -28,11 +28,18 @@ const MemberCard: React.FC<MemberCardProps> = ({ member }) => {
   };
 
   const handleCardClick = (e: React.MouseEvent) => {
-    // Only open profile if the click is on the card itself, not on buttons
-    if ((e.target as HTMLElement).closest('button')) {
+    // Improved event target checking - check if clicking on or within a button
+    const target = e.target as HTMLElement;
+    if (target.tagName === 'BUTTON' || target.closest('button')) {
       return;
     }
     setIsProfileOpen(true);
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    removeMember(member.id);
   };
 
   return (
@@ -53,10 +60,7 @@ const MemberCard: React.FC<MemberCardProps> = ({ member }) => {
                 variant="destructive" 
                 size="icon"
                 className="h-8 w-8 p-0"
-                onClick={(e) => {
-                  e.stopPropagation(); // Prevent card click event
-                  removeMember(member.id);
-                }}
+                onClick={handleDeleteClick}
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
@@ -94,7 +98,7 @@ const MemberCard: React.FC<MemberCardProps> = ({ member }) => {
                 {daysLeft < 0 && (
                   <>
                     <span className="text-lg font-extrabold mr-1">-{-daysLeft}</span>
-                    day{ -daysLeft !== 1 && "s"} expired
+                    day{-daysLeft !== 1 && "s"} expired
                   </>
                 )}
               </span>

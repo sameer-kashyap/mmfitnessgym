@@ -31,13 +31,17 @@ export const EditMemberDialog = ({ member }: EditMemberDialogProps) => {
     setDateOfBirth,
   } = useEditMember(member);
 
+  // This handler ensures clicks on the edit button don't bubble up to parent elements
+  const handleEditClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault(); // Prevent default behavior
+    e.stopPropagation(); // Stop event from bubbling up
+    setIsOpen(true);
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <Button
-        onClick={(e) => {
-          e.stopPropagation(); // Prevent opening profile
-          setIsOpen(true);
-        }}
+        onClick={handleEditClick}
         variant="outline"
         size="sm"
         className="h-8 w-8 p-0"

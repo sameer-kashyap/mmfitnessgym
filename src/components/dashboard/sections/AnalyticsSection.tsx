@@ -1,3 +1,4 @@
+
 import React, { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useMembers } from "@/context/MemberContext";
@@ -193,7 +194,7 @@ export const AnalyticsSection = () => {
                           cx="50%"
                           cy="50%"
                           labelLine={false}
-                          outerRadius={({ chart }) => Math.min(chart.width, chart.height) * 0.35}
+                          outerRadius="45%"
                           fill="#8884d8"
                           dataKey="value"
                           nameKey="name"

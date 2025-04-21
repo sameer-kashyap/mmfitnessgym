@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useMembers } from "../context/MemberContext";
 import { parse, isValid, format } from "date-fns";
@@ -65,7 +66,9 @@ export const useMemberForm = () => {
     return isValid(parsedDate) && parsedDate > new Date('1900-01-01');
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     

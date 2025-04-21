@@ -42,7 +42,10 @@ export const EditMemberDialog = ({ member }: EditMemberDialogProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <Button
-        onClick={() => setIsOpen(true)}
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsOpen(true);
+        }}
         variant="outline"
         size="sm"
         className="h-8 w-8 p-0"
@@ -106,7 +109,7 @@ export const EditMemberDialog = ({ member }: EditMemberDialogProps) => {
 
           {!member.dateOfBirth && (
             <div className="space-y-2">
-              <label className="text-sm font-medium">Date of Birth (DD/MM/YYYY)</label>
+              <label className="text-sm font-medium">Date of Birth</label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button

@@ -15,6 +15,9 @@ const MemberForm: React.FC = () => {
     handleSubmit
   } = useMemberForm();
 
+  // Calculate total (deposit + due)
+  const total = parseFloat(formData.deposit || "0") + parseFloat(formData.due || "0");
+
   return (
     <Card className="gym-card">
       <CardHeader>
@@ -73,10 +76,43 @@ const MemberForm: React.FC = () => {
             type="number"
           />
 
-          <PaymentStatusSelect
-            value={formData.paymentStatus}
-            onChange={(value) => handleSelectChange('paymentStatus', value)}
-          />
+          <div className="space-y-4 border p-4 rounded-md">
+            <h3 className="font-medium">Payment Details</h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                label="Deposit Paid (₹)"
+                id="deposit"
+                name="deposit"
+                value={formData.deposit}
+                onChange={handleChange}
+                type="number"
+                placeholder="Enter amount paid"
+              />
+
+              <FormField
+                label="Amount Due (₹)"
+                id="due"
+                name="due"
+                value={formData.due}
+                onChange={handleChange}
+                type="number"
+                placeholder="Enter amount due"
+              />
+            </div>
+
+            <div className="bg-gray-50 p-3 rounded-md">
+              <div className="flex justify-between">
+                <span className="font-medium">Total:</span>
+                <span>₹{total.toFixed(2)}</span>
+              </div>
+            </div>
+
+            <PaymentStatusSelect
+              value={formData.paymentStatus}
+              onChange={(value) => handleSelectChange('paymentStatus', value)}
+            />
+          </div>
 
           <Button type="submit" className="w-full bg-royal-purple hover:bg-royal-light">
             Add Member

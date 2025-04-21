@@ -1,3 +1,4 @@
+
 export interface Member {
   id: string;
   fullName: string;
@@ -14,6 +15,8 @@ export interface Member {
     threeDays: boolean;
     oneDay: boolean;
   };
+  createdAt?: string; // Add timestamp for analytics
+  updatedAt?: string; // Add timestamp for analytics
 }
 
 export type MemberStatus = 'active' | 'expired' | 'expiring-soon' | 'grace-period';

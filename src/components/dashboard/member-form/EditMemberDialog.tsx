@@ -75,7 +75,9 @@ export const EditMemberDialog = ({ member }: EditMemberDialogProps) => {
             type="number"
           />
 
-          <div className="space-y-2">
+          <div className="space-y-2 border p-4 rounded-md">
+            <h3 className="font-medium mb-3">Payment Details</h3>
+            
             <FormField
               label="Deposit Paid (₹)"
               id="deposit"
@@ -95,16 +97,16 @@ export const EditMemberDialog = ({ member }: EditMemberDialogProps) => {
               type="number"
               placeholder="Enter due amount"
             />
-          </div>
 
-          <PaymentStatusSelect
-            value={formData.paymentStatus}
-            onChange={(value) => handleSelectChange('paymentStatus', value)}
-          />
+            <PaymentStatusSelect
+              value={formData.paymentStatus}
+              onChange={(value) => handleSelectChange('paymentStatus', value)}
+            />
+          </div>
 
           {!member.dateOfBirth && (
             <div className="space-y-2">
-              <label className="text-sm font-medium">Date of Birth</label>
+              <label className="text-sm font-medium">Date of Birth (DD/MM/YYYY)</label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -116,7 +118,7 @@ export const EditMemberDialog = ({ member }: EditMemberDialogProps) => {
                   >
                     <Calendar className="mr-2 h-4 w-4" />
                     {selectedDate ? (
-                      format(selectedDate, "PPP")
+                      format(selectedDate, "dd/MM/yyyy")
                     ) : (
                       <span>Pick a date</span>
                     )}

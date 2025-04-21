@@ -11,6 +11,8 @@ interface FormData {
   paymentStatus: string;
   dateOfBirth: string;
   joiningDate: string;
+  deposit: string;
+  due: string;
 }
 
 interface FormErrors {
@@ -27,6 +29,8 @@ const initialFormData: FormData = {
   paymentStatus: "paid",
   dateOfBirth: "",
   joiningDate: "",
+  deposit: "0",
+  due: "0",
 };
 
 const initialFormErrors: FormErrors = {
@@ -104,6 +108,8 @@ export const useMemberForm = () => {
         : undefined;
     }
 
+    const now = new Date();
+
     addMember({
       fullName: formData.fullName.trim(),
       phone: formData.phone.trim(),
@@ -111,6 +117,10 @@ export const useMemberForm = () => {
       paymentStatus: formData.paymentStatus as 'paid' | 'unpaid',
       dateOfBirth: formattedDob,
       startDate: format(parsedJoiningDate, "yyyy-MM-dd"),
+      deposit: parseFloat(formData.deposit) || 0,
+      due: parseFloat(formData.due) || 0,
+      createdAt: now.toISOString(),
+      updatedAt: now.toISOString()
     });
 
     setFormData(initialFormData);

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Member } from "@/types/member";
 import { useMembers } from "@/context/MemberContext";
 import { toast } from "@/components/ui/sonner";
+import { format } from "date-fns";
 
 interface EditFormData {
   phone: string;
@@ -70,6 +71,7 @@ export const useEditMember = (member: Member) => {
 
     // Reset start date if subscription duration is changed
     const resetStartDate = parseInt(formData.subscriptionDuration) !== member.subscriptionDuration;
+    const now = new Date();
     
     updateMember(member.id, {
       phone: formData.phone.trim(),
@@ -77,8 +79,9 @@ export const useEditMember = (member: Member) => {
       paymentStatus: formData.paymentStatus as 'paid' | 'unpaid',
       deposit: parseFloat(formData.deposit) || 0,
       due: parseFloat(formData.due) || 0,
-      dateOfBirth: selectedDate ? selectedDate.toISOString().split('T')[0] : undefined,
-      ...(resetStartDate && { startDate: new Date().toISOString() })
+      dateOfBirth: selectedDate ? format(selectedDate, "yyyy-MM-dd") : undefined,
+      updatedAt: now.toISOString(),
+      ...(resetStartDate && { startDate: now.toISOString() })
     });
     
     setIsOpen(false);

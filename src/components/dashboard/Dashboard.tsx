@@ -4,10 +4,11 @@ import { Separator } from "../ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { useMembers } from "../../context/MemberContext";
-import { UserCheck, Clock, AlertTriangle, Plus, Users, IndianRupee } from "lucide-react";
+import { UserCheck, Clock, AlertTriangle, Plus, Users, IndianRupee, BarChart3 } from "lucide-react";
 import { AddMemberSection } from "./sections/AddMemberSection";
 import { MembersSection } from "./sections/MembersSection";
 import { PaymentsSection } from "./sections/PaymentsSection";
+import { AnalyticsSection } from "./sections/AnalyticsSection";
 
 const Dashboard: React.FC = () => {
   const { filteredMembers } = useMembers();
@@ -79,7 +80,7 @@ const Dashboard: React.FC = () => {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="members" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
+          <TabsList className="grid w-full grid-cols-4 lg:w-[500px]">
             <TabsTrigger value="members" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
               <span>Members</span>
@@ -91,6 +92,10 @@ const Dashboard: React.FC = () => {
             <TabsTrigger value="payments" className="flex items-center gap-2">
               <IndianRupee className="h-4 w-4" />
               <span>Payments</span>
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              <span>Analytics</span>
             </TabsTrigger>
           </TabsList>
 
@@ -104,6 +109,10 @@ const Dashboard: React.FC = () => {
 
           <TabsContent value="payments" className="m-0">
             <PaymentsSection />
+          </TabsContent>
+
+          <TabsContent value="analytics" className="m-0">
+            <AnalyticsSection />
           </TabsContent>
         </Tabs>
       </div>

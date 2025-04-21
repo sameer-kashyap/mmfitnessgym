@@ -31,9 +31,9 @@ const MemberForm: React.FC = () => {
             error={formErrors.fullName}
             errorMessage="Name is required"
           />
-          
+
           <FormField
-            label="Date of Birth (DD/MM/YYYY)"
+            label="Date of Birth (DD/MM/YYYY) (optional)"
             id="dateOfBirth"
             name="dateOfBirth"
             value={formData.dateOfBirth}
@@ -42,7 +42,18 @@ const MemberForm: React.FC = () => {
             errorMessage="Please enter a valid date of birth in DD/MM/YYYY format"
             placeholder="DD/MM/YYYY"
           />
-          
+
+          <FormField
+            label="Joining Date (DD/MM/YYYY)"
+            id="joiningDate"
+            name="joiningDate"
+            value={formData.joiningDate}
+            onChange={handleChange}
+            error={formErrors.joiningDate}
+            errorMessage="Please enter a valid joining date in DD/MM/YYYY format"
+            placeholder="DD/MM/YYYY"
+          />
+
           <FormField
             label="Phone Number"
             id="phone"
@@ -52,7 +63,7 @@ const MemberForm: React.FC = () => {
             error={formErrors.phone}
             errorMessage="Valid phone number is required"
           />
-          
+
           <FormField
             label="Subscription (Days)"
             id="subscriptionDuration"
@@ -61,12 +72,12 @@ const MemberForm: React.FC = () => {
             onChange={handleChange}
             type="number"
           />
-          
+
           <PaymentStatusSelect
             value={formData.paymentStatus}
             onChange={(value) => handleSelectChange('paymentStatus', value)}
           />
-          
+
           <Button type="submit" className="w-full bg-royal-purple hover:bg-royal-light">
             Add Member
           </Button>

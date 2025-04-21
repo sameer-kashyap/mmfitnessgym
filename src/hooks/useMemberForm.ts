@@ -10,12 +10,14 @@ interface FormData {
   subscriptionDuration: string;
   paymentStatus: string;
   dateOfBirth: string;
+  joiningDate: string;
 }
 
 interface FormErrors {
   fullName: boolean;
   phone: boolean;
   dateOfBirth: boolean;
+  joiningDate: boolean;
 }
 
 const initialFormData: FormData = {
@@ -23,13 +25,15 @@ const initialFormData: FormData = {
   phone: "",
   subscriptionDuration: "30",
   paymentStatus: "paid",
-  dateOfBirth: ""
+  dateOfBirth: "",
+  joiningDate: "",
 };
 
 const initialFormErrors: FormErrors = {
   fullName: false,
   phone: false,
-  dateOfBirth: false
+  dateOfBirth: false,
+  joiningDate: false,
 };
 
 export const useMemberForm = () => {
@@ -42,11 +46,20 @@ export const useMemberForm = () => {
     return re.test(phone);
   };
 
+  // Make date of birth validation only if filled
   const validateDateOfBirth = (dateString: string): boolean => {
+    if (!dateString?.trim()) return true; // Optional
     const parsedDate = parse(dateString, 'dd/MM/yyyy', new Date());
     return isValid(parsedDate) && 
            parsedDate < new Date() && 
-           parsedDate > new Date('1900-01-01');
+           parsedDate > new Date("1900-01-01");
+  };
+
+  const validateJoiningDate = (dateString: string): boolean => {
+    if (!dateString?.trim()) return false; // Required
+    const parsedDate = parse(dateString, 'dd/MM/yyyy', new Date());
+    // Allow any "valid" date after 1900, in the past or today or later (future allowed)
+    return isValid(parsedDate) && parsedDate > new Date('1900-01-01');
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,9 +79,9 @@ export const useMemberForm = () => {
     const newFormErrors = {
       fullName: formData.fullName.trim() === "",
       phone: !validatePhone(formData.phone),
-      dateOfBirth: !validateDateOfBirth(formData.dateOfBirth)
+      dateOfBirth: !validateDateOfBirth(formData.dateOfBirth),
+      joiningDate: !validateJoiningDate(formData.joiningDate),
     };
-    
     setFormErrors(newFormErrors);
     return !Object.values(newFormErrors).some(error => error);
   };
@@ -80,17 +93,26 @@ export const useMemberForm = () => {
       toast.error("Please fix the errors in the form");
       return;
     }
-    
-    const parsedDate = parse(formData.dateOfBirth, 'dd/MM/yyyy', new Date());
-    
+
+    const parsedJoiningDate = parse(formData.joiningDate, 'dd/MM/yyyy', new Date());
+
+    let formattedDob = undefined;
+    if (formData.dateOfBirth?.trim()) {
+      const parsedDob = parse(formData.dateOfBirth, 'dd/MM/yyyy', new Date());
+      formattedDob = isValid(parsedDob)
+        ? format(parsedDob, "yyyy-MM-dd")
+        : undefined;
+    }
+
     addMember({
       fullName: formData.fullName.trim(),
       phone: formData.phone.trim(),
       subscriptionDuration: parseInt(formData.subscriptionDuration),
       paymentStatus: formData.paymentStatus as 'paid' | 'unpaid',
-      dateOfBirth: format(parsedDate, 'yyyy-MM-dd')
+      dateOfBirth: formattedDob,
+      startDate: format(parsedJoiningDate, "yyyy-MM-dd"),
     });
-    
+
     setFormData(initialFormData);
   };
 
@@ -99,6 +121,6 @@ export const useMemberForm = () => {
     formErrors,
     handleChange,
     handleSelectChange,
-    handleSubmit
+    handleSubmit,
   };
 };

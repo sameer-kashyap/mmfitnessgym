@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { Member } from "../types/member";
 import { generateId, getMemberStatus } from "../lib/utils";
@@ -9,7 +8,7 @@ import { useLocalStorage } from "../hooks/useLocalStorage";
 
 type MemberContextType = {
   members: Member[];
-  addMember: (member: Omit<Member, "id" | "startDate" | "reminderSent" | "email">) => void;
+  addMember: (member: Omit<Member, "id" | "reminderSent" | "email">) => void;
   removeMember: (id: string) => void;
   getMember: (id: string) => Member | undefined;
   updateMember: (id: string, member: Partial<Member>) => void;
@@ -39,11 +38,10 @@ export function MemberProvider({ children }: { children: ReactNode }) {
   // Hook for localStorage sync
   useLocalStorage(members, loading);
 
-  const addMember = (memberData: Omit<Member, "id" | "startDate" | "reminderSent" | "email">) => {
+  const addMember = (memberData: Omit<Member, "id" | "reminderSent" | "email">) => {
     const newMember: Member = {
       ...memberData,
       id: generateId(),
-      startDate: new Date().toISOString(),
       reminderSent: {
         sevenDays: false,
         threeDays: false,

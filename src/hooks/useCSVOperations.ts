@@ -1,5 +1,4 @@
-
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { Member } from '@/types/member';
 import { useMembers } from '@/context/MemberContext';
 import { toast } from '@/components/ui/sonner';
@@ -30,6 +29,10 @@ export const useCSVOperations = (members: Member[]) => {
       h.toLowerCase().includes('payment') || 
       h.toLowerCase().includes('status')
     );
+    const startDateIndex = headers.findIndex(h => 
+      h.toLowerCase().includes('joining') || 
+      h.toLowerCase().includes('start')
+    );
 
     if (phoneIndex === -1 || durationIndex === -1) {
       toast.error("CSV is missing required columns. Need at least Phone and Subscription Duration.");
@@ -50,6 +53,24 @@ export const useCSVOperations = (members: Member[]) => {
       const paymentStatus = paymentStatusIndex !== -1 
         ? values[paymentStatusIndex].toLowerCase() === 'paid' ? 'paid' : 'unpaid'
         : 'unpaid';
+      let startDate = new Date().toISOString().split('T')[0];
+      if (startDateIndex !== -1 && values[startDateIndex]) {
+        try {
+          const dateParts = values[startDateIndex].split('/');
+          if (dateParts.length === 3) {
+            const parsedDate = new Date(
+              parseInt(dateParts[2]),
+              parseInt(dateParts[1]) - 1,
+              parseInt(dateParts[0])
+            );
+            if (!isNaN(parsedDate.getTime())) {
+              startDate = parsedDate.toISOString().split('T')[0];
+            }
+          }
+        } catch (e) {
+          errors.push(`Row ${i}: Invalid joining date format, using today's date`);
+        }
+      }
       
       if (!phone || phone.length < 10) {
         errors.push(`Row ${i}: Invalid phone number`);
@@ -66,7 +87,8 @@ export const useCSVOperations = (members: Member[]) => {
         fullName,
         phone,
         subscriptionDuration: duration,
-        paymentStatus
+        paymentStatus,
+        startDate
       });
     }
     
@@ -152,7 +174,8 @@ export const useCSVOperations = (members: Member[]) => {
           fullName: member.fullName,
           phone: member.phone,
           subscriptionDuration: member.subscriptionDuration,
-          paymentStatus: member.paymentStatus
+          paymentStatus: member.paymentStatus,
+          startDate: member.startDate
         });
         existingPhones.add(member.phone);
         importedCount++;

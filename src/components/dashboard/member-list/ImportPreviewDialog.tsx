@@ -57,6 +57,7 @@ export const ImportPreviewDialog = ({
               <TableRow>
                 <TableHead>Full Name</TableHead>
                 <TableHead>Phone</TableHead>
+                <TableHead>Joining Date</TableHead>
                 <TableHead>Subscription (Days)</TableHead>
                 <TableHead>Payment Status</TableHead>
               </TableRow>
@@ -66,6 +67,7 @@ export const ImportPreviewDialog = ({
                 <TableRow key={index}>
                   <TableCell>{member.fullName}</TableCell>
                   <TableCell>{member.phone}</TableCell>
+                  <TableCell>{new Date(member.startDate).toLocaleDateString()}</TableCell>
                   <TableCell>{member.subscriptionDuration}</TableCell>
                   <TableCell>{member.paymentStatus}</TableCell>
                 </TableRow>

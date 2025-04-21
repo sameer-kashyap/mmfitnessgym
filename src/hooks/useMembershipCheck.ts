@@ -1,3 +1,4 @@
+
 import { useEffect } from 'react';
 import { Member } from '../types/member';
 import { calculateDaysLeft, getMemberStatus } from '../lib/utils';
@@ -17,6 +18,14 @@ export function useMembershipCheck(
       const daysLeft = calculateDaysLeft(member.startDate, member.subscriptionDuration);
       const memberStatus = getMemberStatus(member);
       let updatedMember = { ...member };
+
+      // Automatically set payment status to "unpaid" if expired and status is "paid"
+      if (daysLeft < 0 && updatedMember.paymentStatus === "paid") {
+        updatedMember.paymentStatus = "unpaid";
+        toast.info(
+          `${updatedMember.fullName}'s payment status auto-updated to 'Unpaid' due to subscription expiry`
+        );
+      }
 
       if (memberStatus === 'expiring-soon' && updatedMember.reminderSent) {
         if (daysLeft === 7 && !updatedMember.reminderSent.sevenDays) {
@@ -86,3 +95,4 @@ export function useMembershipCheck(
     return () => clearInterval(interval);
   }, [members, emailJSLoaded]);
 }
+

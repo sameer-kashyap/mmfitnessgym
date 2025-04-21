@@ -17,16 +17,13 @@ const MemberCard: React.FC<MemberCardProps> = ({ member }) => {
   const daysLeft = calculateDaysLeft(member.startDate, member.subscriptionDuration);
   const endDate = new Date(new Date(member.startDate).getTime() + (member.subscriptionDuration * 24 * 60 * 60 * 1000));
 
-  const getStatusClass = () => {
-    if (daysLeft > 7) return "status-active";
-    if (daysLeft > 0) return "status-expiring";
-    if (daysLeft > -7) return "status-expired";
-    return "status-unpaid";
+  const getStatusColorClass = () => {
+    if (daysLeft > 7) return "bg-green-100 text-green-800 border-green-200";
+    if (daysLeft > 0) return "bg-amber-100 text-amber-800 border-amber-200";
+    if (daysLeft === 0) return "bg-amber-100 text-amber-800 border-amber-200";
+    if (daysLeft < 0) return "bg-[#ea384c] text-white border-transparent animate-pulse";
+    return "bg-gray-100 text-gray-800 border-gray-200";
   };
-
-  // Calculate days since expiration
-  const daysSinceExpired = daysLeft < 0 ? Math.abs(daysLeft) : 0;
-  const showExpiredBadge = daysLeft < 0;
 
   return (
     <Card className="gym-card relative overflow-visible">
@@ -60,22 +57,38 @@ const MemberCard: React.FC<MemberCardProps> = ({ member }) => {
             <span>Subscription ends:</span>
             <span>{formatDate(endDate.toISOString())}</span>
           </div>
-          {showExpiredBadge && (
-            <div className="mt-1 flex items-center">
-              <span
-                className="inline-block rounded-full px-3 py-1 text-xs font-semibold bg-[#ea384c] text-white animate-pulse shadow"
-                aria-label={`Expired: ${daysSinceExpired} days ago`}
-              >
-                Expired: {daysSinceExpired} day{daysSinceExpired !== 1 && "s"} ago
-              </span>
-            </div>
-          )}
-          <div className="flex justify-between items-center">
-            <span className={`status-badge ${getStatusClass()}`}>
-              {daysLeft > 0 ? `${daysLeft} days left` : "Expired"}
+          <div className="flex justify-between items-center mt-2">
+            <span
+              className={`inline-block rounded-full border px-3 py-1 text-xs font-bold shadow transition-all ${getStatusColorClass()}`}
+              aria-label={
+                daysLeft > 0
+                  ? `${daysLeft} days left`
+                  : daysLeft === 0
+                  ? "Expires today"
+                  : `Expired: ${-daysLeft} day${-daysLeft !== 1 ? "s" : ""} ago`
+              }
+            >
+              {daysLeft > 0 && (
+                <>
+                  {daysLeft} day{daysLeft !== 1 && "s"} left
+                </>
+              )}
+              {daysLeft === 0 && <>Expires today</>}
+              {daysLeft < 0 && (
+                <>
+                  <span className="text-lg font-extrabold mr-1">-{-daysLeft}</span>
+                  day{ -daysLeft !== 1 && "s"} expired
+                </>
+              )}
             </span>
-            <span className={`status-badge ${member.paymentStatus === 'paid' ? 'status-active' : 'status-unpaid'}`}>
-              {member.paymentStatus === 'paid' ? 'Paid' : 'Unpaid'}
+            <span
+              className={`ml-2 status-badge px-3 py-1 rounded-full text-xs font-semibold ${
+                member.paymentStatus === "paid"
+                  ? "bg-green-100 text-green-800 border border-green-200"
+                  : "bg-gray-200 text-[#ea384c] border border-[#ea384c]"
+              }`}
+            >
+              {member.paymentStatus === "paid" ? "Paid" : "Unpaid"}
             </span>
           </div>
         </div>

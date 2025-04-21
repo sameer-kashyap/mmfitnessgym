@@ -1,4 +1,3 @@
-
 import React, { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useMembers } from "@/context/MemberContext";
@@ -10,6 +9,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { PieChart as ReChartPieChart, Pie, Cell, Legend, ResponsiveContainer } from "recharts";
+import { calculateDaysLeft } from "@/lib/utils";
 
 export const AnalyticsSection = () => {
   const { members } = useMembers();
@@ -94,15 +94,6 @@ export const AnalyticsSection = () => {
       bestDay: dayCount.every(count => count === 0) ? "No data" : bestDay
     };
   }, [members, currentMonthStart, currentMonthEnd, lastMonthStart, lastMonthEnd]);
-
-  // Helper function to calculate days left
-  const calculateDaysLeft = (startDate: string, duration: number): number => {
-    const start = new Date(startDate).getTime();
-    const end = start + (duration * 24 * 60 * 60 * 1000);
-    const now = new Date().getTime();
-    
-    return Math.ceil((end - now) / (24 * 60 * 60 * 1000));
-  };
 
   const COLORS = ["#4ade80", "#fbbf24", "#ef4444"];
 

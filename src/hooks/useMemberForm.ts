@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useMembers } from "../context/MemberContext";
 import { parse, isValid, format } from "date-fns";
@@ -13,6 +12,7 @@ interface FormData {
   joiningDate: string;
   deposit: string;
   due: string;
+  description?: string;
 }
 
 interface FormErrors {
@@ -31,6 +31,7 @@ const initialFormData: FormData = {
   joiningDate: "",
   deposit: "0",
   due: "0",
+  description: "",
 };
 
 const initialFormErrors: FormErrors = {
@@ -50,9 +51,8 @@ export const useMemberForm = () => {
     return re.test(phone);
   };
 
-  // Make date of birth validation only if filled
   const validateDateOfBirth = (dateString: string): boolean => {
-    if (!dateString?.trim()) return true; // Optional
+    if (!dateString?.trim()) return true;
     const parsedDate = parse(dateString, 'dd/MM/yyyy', new Date());
     return isValid(parsedDate) && 
            parsedDate < new Date() && 
@@ -60,9 +60,8 @@ export const useMemberForm = () => {
   };
 
   const validateJoiningDate = (dateString: string): boolean => {
-    if (!dateString?.trim()) return false; // Required
+    if (!dateString?.trim()) return false;
     const parsedDate = parse(dateString, 'dd/MM/yyyy', new Date());
-    // Allow any "valid" date after 1900, in the past or today or later (future allowed)
     return isValid(parsedDate) && parsedDate > new Date('1900-01-01');
   };
 
@@ -119,6 +118,7 @@ export const useMemberForm = () => {
       startDate: format(parsedJoiningDate, "yyyy-MM-dd"),
       deposit: parseFloat(formData.deposit) || 0,
       due: parseFloat(formData.due) || 0,
+      description: formData.description?.trim(),
       createdAt: now.toISOString(),
       updatedAt: now.toISOString()
     });

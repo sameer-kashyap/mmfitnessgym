@@ -9,14 +9,15 @@ export interface Member {
   dateOfBirth?: string;
   deposit?: number;
   due?: number;
-  email?: string; // Make email optional as we're phasing it out
+  email?: string;
   reminderSent?: {
     sevenDays: boolean;
     threeDays: boolean;
     oneDay: boolean;
   };
-  createdAt?: string; // Add timestamp for analytics
-  updatedAt?: string; // Add timestamp for analytics
+  description?: string; // Add description field
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export type MemberStatus = 'active' | 'expired' | 'expiring-soon' | 'grace-period';

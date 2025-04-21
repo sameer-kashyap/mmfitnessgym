@@ -1,10 +1,11 @@
-
 import React from "react";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { FormField } from "./member-form/FormField";
 import { PaymentStatusSelect } from "./member-form/PaymentStatusSelect";
 import { useMemberForm } from "@/hooks/useMemberForm";
+import { Textarea } from "../ui/textarea";
+import { Label } from "../ui/label";
 
 const MemberForm: React.FC = () => {
   const {
@@ -24,7 +25,7 @@ const MemberForm: React.FC = () => {
         <CardTitle className="text-royal-purple">Add New Member</CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <FormField
             label="Full Name"
             id="fullName"
@@ -112,6 +113,21 @@ const MemberForm: React.FC = () => {
               value={formData.paymentStatus}
               onChange={(value) => handleSelectChange('paymentStatus', value)}
             />
+          </div>
+
+          <div className="space-y-4 border p-4 rounded-md">
+            <h3 className="font-medium">Member Description</h3>
+            <div className="space-y-2">
+              <Label htmlFor="description">Additional Notes</Label>
+              <Textarea
+                id="description"
+                name="description"
+                value={formData.description || ""}
+                onChange={handleChange}
+                placeholder="Enter any additional notes about the member..."
+                className="min-h-[100px]"
+              />
+            </div>
           </div>
 
           <Button type="submit" className="w-full bg-royal-purple hover:bg-royal-light">

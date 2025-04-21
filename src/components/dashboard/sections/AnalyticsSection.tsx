@@ -22,7 +22,6 @@ export const AnalyticsSection = () => {
   const lastMonthStart = startOfMonth(subMonths(now, 1));
   const lastMonthEnd = endOfMonth(subMonths(now, 1));
 
-  // Function to check if a date is within a range
   const isDateInRange = (dateString: string, start: Date, end: Date) => {
     if (!dateString) return false;
     try {
@@ -33,9 +32,7 @@ export const AnalyticsSection = () => {
     }
   };
 
-  // Calculate analytics data
   const analytics = useMemo(() => {
-    // Filter members created this month and last month
     const currentMonthMembers = members.filter(member => 
       member.createdAt && isDateInRange(member.createdAt, currentMonthStart, currentMonthEnd)
     );
@@ -44,11 +41,9 @@ export const AnalyticsSection = () => {
       member.createdAt && isDateInRange(member.createdAt, lastMonthStart, lastMonthEnd)
     );
 
-    // Calculate total deposits for current and last month
     const currentMonthDeposits = currentMonthMembers.reduce((total, member) => total + (member.deposit || 0), 0);
     const lastMonthDeposits = lastMonthMembers.reduce((total, member) => total + (member.deposit || 0), 0);
 
-    // Calculate percent changes
     const memberPercentChange = lastMonthMembers.length > 0 
       ? ((currentMonthMembers.length - lastMonthMembers.length) / lastMonthMembers.length) * 100 
       : 100;
@@ -57,7 +52,6 @@ export const AnalyticsSection = () => {
       ? ((currentMonthDeposits - lastMonthDeposits) / lastMonthDeposits) * 100 
       : 100;
 
-    // Active vs Expired members
     const active = members.filter(m => calculateDaysLeft(m.startDate, m.subscriptionDuration) > 7).length;
     const expiringSoon = members.filter(m => {
       const days = calculateDaysLeft(m.startDate, m.subscriptionDuration);
@@ -65,11 +59,9 @@ export const AnalyticsSection = () => {
     }).length;
     const expired = members.filter(m => calculateDaysLeft(m.startDate, m.subscriptionDuration) <= 0).length;
 
-    // Total dues
     const totalDues = members.reduce((total, member) => total + (member.due || 0), 0);
 
-    // Best day for signups
-    const dayCount = [0, 0, 0, 0, 0, 0, 0]; // Sun, Mon, ..., Sat
+    const dayCount = [0, 0, 0, 0, 0, 0, 0];
     currentMonthMembers.forEach(member => {
       if (member.createdAt) {
         const day = getDay(parseISO(member.createdAt));
@@ -105,9 +97,7 @@ export const AnalyticsSection = () => {
           <CardDescription>Track your gym's performance</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Top metrics row */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* New Members */}
             <Card>
               <CardContent className="pt-6">
                 <div className="flex justify-between items-center mb-4">
@@ -137,7 +127,6 @@ export const AnalyticsSection = () => {
               </CardContent>
             </Card>
 
-            {/* Total Earnings */}
             <Card>
               <CardContent className="pt-6">
                 <div className="flex justify-between items-center mb-4">
@@ -167,7 +156,6 @@ export const AnalyticsSection = () => {
               </CardContent>
             </Card>
 
-            {/* Best Signup Day */}
             <Card>
               <CardContent className="pt-6">
                 <div className="flex justify-between items-center mb-4">
@@ -186,15 +174,13 @@ export const AnalyticsSection = () => {
             </Card>
           </div>
 
-          {/* Member Status and Dues */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Active vs Expiring vs Expired */}
             <Card>
               <CardHeader className="pb-0">
                 <CardTitle className="text-lg">Member Status Distribution</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-[250px] w-full">
+                <div className="h-[300px] w-full sm:h-[250px]">
                   <ChartContainer config={{
                     active: { color: "#4ade80" },
                     expiringSoon: { color: "#fbbf24" },
@@ -207,7 +193,7 @@ export const AnalyticsSection = () => {
                           cx="50%"
                           cy="50%"
                           labelLine={false}
-                          outerRadius={80}
+                          outerRadius={({ chart }) => Math.min(chart.width, chart.height) * 0.35}
                           fill="#8884d8"
                           dataKey="value"
                           nameKey="name"
@@ -217,7 +203,15 @@ export const AnalyticsSection = () => {
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                           ))}
                         </Pie>
-                        <Legend />
+                        <Legend 
+                          layout="horizontal" 
+                          verticalAlign="bottom"
+                          align="center"
+                          wrapperStyle={{
+                            paddingTop: '20px',
+                            fontSize: '12px'
+                          }}
+                        />
                         <ChartTooltip content={<ChartTooltipContent />} />
                       </ReChartPieChart>
                     </ResponsiveContainer>
@@ -226,7 +220,6 @@ export const AnalyticsSection = () => {
               </CardContent>
             </Card>
 
-            {/* Total Dues */}
             <Card>
               <CardHeader className="pb-0">
                 <CardTitle className="text-lg">Dues Overview</CardTitle>

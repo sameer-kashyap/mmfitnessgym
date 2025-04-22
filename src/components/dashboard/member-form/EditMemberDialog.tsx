@@ -37,6 +37,11 @@ export const EditMemberDialog = ({ member }: EditMemberDialogProps) => {
     e.stopPropagation(); // Stop event from bubbling up
     setIsOpen(true);
   };
+  
+  // Prevent dialog interactions from bubbling up to the card
+  const handleDialogClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -49,12 +54,12 @@ export const EditMemberDialog = ({ member }: EditMemberDialogProps) => {
         <Pencil className="h-4 w-4" />
       </Button>
 
-      <DialogContent>
+      <DialogContent onClick={handleDialogClick}>
         <DialogHeader>
           <DialogTitle>Edit Member: {member.fullName}</DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4" onClick={e => e.stopPropagation()}>
           <FormField
             label="Phone Number"
             id="phone"
@@ -120,11 +125,14 @@ export const EditMemberDialog = ({ member }: EditMemberDialogProps) => {
             <Button
               type="button"
               variant="outline"
-              onClick={() => setIsOpen(false)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsOpen(false);
+              }}
             >
               Cancel
             </Button>
-            <Button type="submit">Save Changes</Button>
+            <Button type="submit" onClick={e => e.stopPropagation()}>Save Changes</Button>
           </DialogFooter>
         </form>
       </DialogContent>

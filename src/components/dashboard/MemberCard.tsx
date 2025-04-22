@@ -28,11 +28,20 @@ const MemberCard: React.FC<MemberCardProps> = ({ member }) => {
   };
 
   const handleCardClick = (e: React.MouseEvent) => {
-    // Improved event target checking - check if clicking on or within a button
+    // We need to check if the click occurred within the dialog or its children
     const target = e.target as HTMLElement;
-    if (target.tagName === 'BUTTON' || target.closest('button')) {
+    
+    // Don't open profile if clicking on any button, dialog, or dialog-related elements
+    if (
+      target.tagName === 'BUTTON' || 
+      target.closest('button') || 
+      target.closest('[role="dialog"]') ||
+      target.getAttribute('role') === 'dialog' ||
+      target.closest('[data-radix-portal]')
+    ) {
       return;
     }
+    
     setIsProfileOpen(true);
   };
 

@@ -54,5 +54,32 @@ export const notificationService = {
       console.error('Error sending expiry notification:', error);
       return false;
     }
+  },
+
+  async sendCustomMessage(phoneNumber: string, name: string, message: string): Promise<boolean> {
+    try {
+      // Basic validation
+      if (!phoneNumber || !message) {
+        throw new Error("Phone number and message are required");
+      }
+      
+      const { data, error } = await supabase.functions.invoke('send-whatsapp', {
+        body: {
+          memberName: name,
+          phoneNumber: phoneNumber,
+          message: message
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      console.log('Custom notification sent:', data);
+      return true;
+    } catch (error) {
+      console.error('Error sending custom notification:', error);
+      return false;
+    }
   }
 };

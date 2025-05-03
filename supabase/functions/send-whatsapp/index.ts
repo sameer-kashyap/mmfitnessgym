@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { memberName, phoneNumber, messageType, expiryDate } = await req.json();
+    const { memberName, phoneNumber, messageType, expiryDate, message } = await req.json();
     
     // In a real implementation, you would use a WhatsApp Business API provider here
     // For example: Twilio, MessageBird, etc.
@@ -23,13 +23,23 @@ serve(async (req) => {
     
     let messageContent = "";
     
-    if (messageType === 'new-member') {
+    if (message) {
+      // If a custom message is provided, use that
+      messageContent = message;
+    } else if (messageType === 'new-member') {
       messageContent = `Welcome to MM Fitness, ${memberName}! Your membership has been successfully added.`;
     } else if (messageType === 'expiry') {
       messageContent = `Dear ${memberName}, your MM Fitness membership is expiring on ${expiryDate}. Please renew to continue enjoying our services.`;
     }
     
     console.log(`Message content: ${messageContent}`);
+    
+    // Get API tokens from environment variables
+    const ultramsgToken = Deno.env.get("ULTRAMSG_TOKEN");
+    const ultramsgInstanceId = Deno.env.get("ULTRAMSG_INSTANCE_ID");
+    
+    // Log that we would send the message (for demo purposes)
+    console.log("UltraMsg credentials available:", !!ultramsgToken && !!ultramsgInstanceId);
     
     // Return success response
     return new Response(

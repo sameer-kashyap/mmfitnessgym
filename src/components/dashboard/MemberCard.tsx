@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Member } from "../../types/member";
 import { useMembers } from "../../context/MemberContext";
@@ -8,6 +7,7 @@ import { calculateDaysLeft, formatDate } from "../../lib/utils";
 import { Trash2 } from "lucide-react";
 import { EditMemberDialog } from "./member-form/EditMemberDialog";
 import { MemberProfile } from "./member-profile/MemberProfile";
+import { WhatsAppMessageDialog } from "@/components/notifications/WhatsAppMessageDialog";
 
 interface MemberCardProps {
   member: Member;
@@ -65,6 +65,12 @@ const MemberCard: React.FC<MemberCardProps> = ({ member }) => {
             </div>
             <div className="flex gap-2">
               <EditMemberDialog member={member} />
+              <WhatsAppMessageDialog 
+                member={member} 
+                buttonText="" 
+                variant="outline" 
+                size="sm" 
+              />
               <Button 
                 variant="destructive" 
                 size="icon"

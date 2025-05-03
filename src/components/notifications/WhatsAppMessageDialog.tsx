@@ -19,6 +19,7 @@ type WhatsAppMessageDialogProps = {
   showIcon?: boolean;
   variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
   size?: "default" | "sm" | "lg" | "icon";
+  className?: string;
 };
 
 export const WhatsAppMessageDialog: React.FC<WhatsAppMessageDialogProps> = ({ 
@@ -26,14 +27,15 @@ export const WhatsAppMessageDialog: React.FC<WhatsAppMessageDialogProps> = ({
   buttonText = "Send WhatsApp", 
   showIcon = true,
   variant = "default",
-  size = "default"
+  size = "default",
+  className
 }) => {
   const [open, setOpen] = React.useState(false);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={variant} size={size}>
+        <Button variant={variant} size={size} className={className}>
           {showIcon && <MessageSquare className="h-4 w-4 mr-2" />}
           {buttonText}
         </Button>

@@ -15,12 +15,7 @@ serve(async (req) => {
   try {
     const { memberName, phoneNumber, messageType, expiryDate, message } = await req.json();
     
-    // In a real implementation, you would use a WhatsApp Business API provider here
-    // For example: Twilio, MessageBird, etc.
-    
-    // For demonstration, we'll log what would be sent
-    console.log(`Would send WhatsApp message to ${phoneNumber} about ${memberName}`);
-    
+    // Build the message content based on the type or use custom message
     let messageContent = "";
     
     if (message) {
@@ -38,14 +33,38 @@ serve(async (req) => {
     const ultramsgToken = Deno.env.get("ULTRAMSG_TOKEN");
     const ultramsgInstanceId = Deno.env.get("ULTRAMSG_INSTANCE_ID");
     
-    // Log that we would send the message (for demo purposes)
     console.log("UltraMsg credentials available:", !!ultramsgToken && !!ultramsgInstanceId);
     
-    // Return success response
+    if (!ultramsgToken || !ultramsgInstanceId) {
+      throw new Error("UltraMsg credentials not found in environment variables");
+    }
+
+    // Send the actual message to UltraMsg API
+    const response = await fetch(`https://api.ultramsg.com/${ultramsgInstanceId}/messages/chat`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: new URLSearchParams({
+        token: ultramsgToken,
+        to: phoneNumber.replace(/^\+/, ""),  // Remove leading + if present
+        body: messageContent
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      throw new Error(`Failed to send WhatsApp message: ${errorData}`);
+    }
+    
+    const result = await response.json();
+    
+    // Return success response with the API result
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: "Notification queued for sending" 
+        message: "WhatsApp message sent successfully",
+        result
       }),
       { 
         headers: { ...corsHeaders, "Content-Type": "application/json" },

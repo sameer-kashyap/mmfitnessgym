@@ -110,8 +110,7 @@ export const useMemberForm = () => {
         : undefined;
     }
 
-    const now = new Date();
-
+    // Create member with the snake_case properties that match database fields
     addMember({
       full_name: formData.full_name.trim(),
       phone: formData.phone.trim(),

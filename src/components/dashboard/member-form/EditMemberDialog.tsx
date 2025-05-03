@@ -72,9 +72,9 @@ export const EditMemberDialog = ({ member }: EditMemberDialogProps) => {
 
           <FormField
             label="Subscription (Days)"
-            id="subscriptionDuration"
-            name="subscriptionDuration"
-            value={formData.subscriptionDuration}
+            id="subscription_duration"
+            name="subscription_duration"
+            value={formData.subscription_duration}
             onChange={handleChange}
             type="number"
           />
@@ -103,8 +103,8 @@ export const EditMemberDialog = ({ member }: EditMemberDialogProps) => {
             />
 
             <PaymentStatusSelect
-              value={formData.paymentStatus}
-              onChange={(value) => handleSelectChange('paymentStatus', value)}
+              value={formData.payment_status}
+              onChange={(value) => handleSelectChange('payment_status', value)}
             />
           </div>
 

@@ -42,32 +42,32 @@ const MemberForm: React.FC = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           <FormField
             label="Full Name"
-            id="fullName"
-            name="fullName"
-            value={formData.fullName}
+            id="full_name"
+            name="full_name"
+            value={formData.full_name}
             onChange={handleChange}
-            error={formErrors.fullName}
+            error={formErrors.full_name}
             errorMessage="Name is required"
           />
 
           <FormField
             label="Date of Birth (DD/MM/YYYY) (optional)"
-            id="dateOfBirth"
-            name="dateOfBirth"
-            value={formData.dateOfBirth}
+            id="date_of_birth"
+            name="date_of_birth"
+            value={formData.date_of_birth}
             onChange={handleChange}
-            error={formErrors.dateOfBirth}
+            error={formErrors.date_of_birth}
             errorMessage="Please enter a valid date of birth in DD/MM/YYYY format"
             placeholder="DD/MM/YYYY"
           />
 
           <FormField
             label="Joining Date (DD/MM/YYYY)"
-            id="joiningDate"
-            name="joiningDate"
-            value={formData.joiningDate}
+            id="joining_date"
+            name="joining_date"
+            value={formData.joining_date}
             onChange={handleChange}
-            error={formErrors.joiningDate}
+            error={formErrors.joining_date}
             errorMessage="Please enter a valid joining date in DD/MM/YYYY format"
             placeholder="DD/MM/YYYY"
           />
@@ -84,9 +84,9 @@ const MemberForm: React.FC = () => {
 
           <FormField
             label="Subscription (Days)"
-            id="subscriptionDuration"
-            name="subscriptionDuration"
-            value={formData.subscriptionDuration}
+            id="subscription_duration"
+            name="subscription_duration"
+            value={formData.subscription_duration}
             onChange={handleChange}
             type="number"
           />
@@ -124,8 +124,8 @@ const MemberForm: React.FC = () => {
             </div>
 
             <PaymentStatusSelect
-              value={formData.paymentStatus}
-              onChange={(value) => handleSelectChange('paymentStatus', value)}
+              value={formData.payment_status}
+              onChange={(value) => handleSelectChange('payment_status', value)}
             />
           </div>
 

@@ -99,6 +99,7 @@ export const useEditMember = (member: Member) => {
       }
     }
     
+    // Update using the snake_case properties that match database fields
     updateMember(member.id, {
       phone: formData.phone.trim(),
       subscription_duration: parseInt(formData.subscription_duration),

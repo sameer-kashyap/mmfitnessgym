@@ -85,10 +85,14 @@ export const useCSVOperations = (members: Member[]) => {
       
       parsedMembers.push({
         fullName,
+        full_name: fullName,
         phone,
         subscriptionDuration: duration,
+        subscription_duration: duration,
         paymentStatus,
-        startDate
+        payment_status: paymentStatus,
+        startDate,
+        start_date: startDate
       });
     }
     
@@ -172,10 +176,14 @@ export const useCSVOperations = (members: Member[]) => {
       } else {
         addMember({
           fullName: member.fullName,
+          full_name: member.fullName,
           phone: member.phone,
           subscriptionDuration: member.subscriptionDuration,
+          subscription_duration: member.subscriptionDuration,
           paymentStatus: member.paymentStatus,
-          startDate: member.startDate
+          payment_status: member.paymentStatus,
+          startDate: member.startDate,
+          start_date: member.startDate
         });
         existingPhones.add(member.phone);
         importedCount++;

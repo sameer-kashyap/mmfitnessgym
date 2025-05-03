@@ -9,8 +9,6 @@ export interface Member {
   subscriptionDuration: number;
   paymentStatus: 'paid' | 'unpaid';
   dateOfBirth?: string;
-  deposit?: number;
-  due?: number;
   email?: string;
   description?: string;
   createdAt?: string;
@@ -22,6 +20,8 @@ export interface Member {
   subscription_duration: number;
   payment_status: 'paid' | 'unpaid';
   date_of_birth?: string;
+  email?: string;
+  description?: string;
   deposit?: number;
   due?: number;
   created_at?: string;

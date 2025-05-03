@@ -3,9 +3,19 @@ import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { Member } from "@/types/member";
 
+// Track sent messages to prevent duplicates
+const sentMessages = new Set<string>();
+
 export const notificationService = {
   async sendNewMemberAlert(member: Member): Promise<boolean> {
     try {
+      // Check if we've already sent a message to this member
+      const messageKey = `new-member-${member.id}`;
+      if (sentMessages.has(messageKey)) {
+        console.log('Message already sent to this member, skipping duplicate');
+        return true;
+      }
+
       const { data, error } = await supabase.functions.invoke('send-whatsapp', {
         body: {
           memberName: member.full_name,
@@ -18,6 +28,9 @@ export const notificationService = {
         throw error;
       }
 
+      // Mark this message as sent
+      sentMessages.add(messageKey);
+      
       console.log('New member notification sent:', data);
       return true;
     } catch (error) {
@@ -28,6 +41,13 @@ export const notificationService = {
 
   async sendExpiryAlert(member: Member): Promise<boolean> {
     try {
+      // Create a unique key for this message type
+      const messageKey = `expiry-${member.id}`;
+      if (sentMessages.has(messageKey)) {
+        console.log('Expiry alert already sent to this member, skipping duplicate');
+        return true;
+      }
+      
       // Calculate expiry date
       const startDate = new Date(member.start_date);
       const expiryDate = new Date(startDate);
@@ -47,6 +67,9 @@ export const notificationService = {
       if (error) {
         throw error;
       }
+
+      // Mark this message as sent
+      sentMessages.add(messageKey);
 
       console.log('Expiry notification sent:', data);
       return true;
@@ -81,5 +104,10 @@ export const notificationService = {
       console.error('Error sending custom notification:', error);
       return false;
     }
+  },
+  
+  // Clear message tracking (useful for testing)
+  clearMessageTracking(): void {
+    sentMessages.clear();
   }
 };

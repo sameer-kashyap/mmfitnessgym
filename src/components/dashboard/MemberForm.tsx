@@ -1,5 +1,5 @@
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { FormField } from "./member-form/FormField";
@@ -20,11 +20,18 @@ const MemberForm: React.FC = () => {
   } = useMemberForm();
   
   const { members } = useMembers();
+  const lastAddedMemberRef = useRef<string | null>(null);
 
   // Setup WhatsApp notification for new members
   useEffect(() => {
     const lastAddedMember = members[0];
-    if (lastAddedMember && new Date(lastAddedMember.created_at || '').getTime() > Date.now() - 5000) {
+    if (
+      lastAddedMember && 
+      new Date(lastAddedMember.created_at || '').getTime() > Date.now() - 5000 &&
+      lastAddedMember.id !== lastAddedMemberRef.current
+    ) {
+      // Track this member to prevent duplicate messages
+      lastAddedMemberRef.current = lastAddedMember.id;
       // Send WhatsApp notification for new member (only for recently added members)
       notificationService.sendNewMemberAlert(lastAddedMember);
     }

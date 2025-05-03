@@ -4,14 +4,19 @@ import { Separator } from "../ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { useMembers } from "../../context/MemberContext";
-import { UserCheck, Clock, AlertTriangle, Plus, Users, IndianRupee, BarChart3 } from "lucide-react";
+import { UserCheck, Clock, AlertTriangle, Plus, Users, IndianRupee, BarChart3, Settings } from "lucide-react";
 import { AddMemberSection } from "./sections/AddMemberSection";
 import { MembersSection } from "./sections/MembersSection";
 import { PaymentsSection } from "./sections/PaymentsSection";
 import { AnalyticsSection } from "./sections/AnalyticsSection";
+import { Link } from "react-router-dom";
+import { LogoutButton } from "../auth/LogoutButton";
+import { useAuth } from "@/context/AuthContext";
 
 const Dashboard: React.FC = () => {
   const { filteredMembers } = useMembers();
+  const { user } = useAuth();
+  
   const totalMembers = filteredMembers('all').length;
   const activeMembers = filteredMembers('active').length;
   const expiringSoonMembers = filteredMembers('expiring-soon').length;
@@ -26,11 +31,23 @@ const Dashboard: React.FC = () => {
             <h1 className="text-3xl font-bold text-royal-purple">MM Fitness</h1>
             <p className="text-muted-foreground">Member Management Dashboard</p>
           </div>
-          <img
-            src="/lovable-uploads/988c260d-5fb3-4221-baf8-10d17709045b.png"
-            alt="MM Fitness Logo"
-            className="h-16 w-auto"
-          />
+          <div className="flex items-center gap-4">
+            <div className="text-sm text-gray-500">
+              <span className="font-medium">{user?.email}</span>
+            </div>
+            <Link to="/profile">
+              <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                <Settings className="h-4 w-4" />
+                <span>Settings</span>
+              </Button>
+            </Link>
+            <LogoutButton />
+            <img
+              src="/lovable-uploads/988c260d-5fb3-4221-baf8-10d17709045b.png"
+              alt="MM Fitness Logo"
+              className="h-16 w-auto"
+            />
+          </div>
         </div>
 
         <Separator />

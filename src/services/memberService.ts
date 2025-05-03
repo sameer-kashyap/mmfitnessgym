@@ -4,7 +4,7 @@ import { Member } from "@/types/member";
 import { toast } from "@/components/ui/sonner";
 
 export const memberService = {
-  async getMembers(): Promise<Member[]> {
+  async getMembers(): Promise<any[]> {
     try {
       const { data, error } = await supabase
         .from('members')
@@ -23,7 +23,7 @@ export const memberService = {
     }
   },
 
-  async addMember(member: Omit<Member, 'id'>): Promise<Member | null> {
+  async addMember(member: any): Promise<any | null> {
     try {
       const { data, error } = await supabase
         .from('members')
@@ -44,7 +44,7 @@ export const memberService = {
     }
   },
 
-  async updateMember(id: string, updates: Partial<Member>): Promise<Member | null> {
+  async updateMember(id: string, updates: any): Promise<any | null> {
     try {
       const { data, error } = await supabase
         .from('members')

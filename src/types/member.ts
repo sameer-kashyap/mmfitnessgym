@@ -1,12 +1,11 @@
-
 export interface Member {
   id: string;
-  full_name: string;
+  fullName: string;
   phone: string;
-  start_date: string;
-  subscription_duration: number;
-  payment_status: 'paid' | 'unpaid';
-  date_of_birth?: string;
+  startDate: string;
+  subscriptionDuration: number;
+  paymentStatus: 'paid' | 'unpaid';
+  dateOfBirth?: string;
   deposit?: number;
   due?: number;
   email?: string;
@@ -16,6 +15,15 @@ export interface Member {
     oneDay: boolean;
   };
   description?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  
+  // Keep the original database field names for compatibility with Supabase
+  full_name?: string;
+  start_date?: string;
+  subscription_duration?: number;
+  payment_status?: 'paid' | 'unpaid';
+  date_of_birth?: string;
   created_at?: string;
   updated_at?: string;
 }

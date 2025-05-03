@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { Member } from "../types/member";
 import { getMemberStatus } from "../lib/utils";
@@ -19,6 +18,62 @@ type MemberContextType = {
 
 const MemberContext = createContext<MemberContextType | undefined>(undefined);
 
+// Helper function to transform database records to our frontend model
+const transformMemberFromDB = (dbMember: any): Member => {
+  return {
+    id: dbMember.id,
+    fullName: dbMember.full_name,
+    phone: dbMember.phone,
+    startDate: dbMember.start_date,
+    subscriptionDuration: dbMember.subscription_duration,
+    paymentStatus: dbMember.payment_status as 'paid' | 'unpaid',
+    dateOfBirth: dbMember.date_of_birth,
+    deposit: dbMember.deposit,
+    due: dbMember.due,
+    email: dbMember.email,
+    description: dbMember.description,
+    reminder_sent: dbMember.reminder_sent,
+    createdAt: dbMember.created_at,
+    updatedAt: dbMember.updated_at,
+    
+    // Keep original fields for compatibility
+    full_name: dbMember.full_name,
+    start_date: dbMember.start_date,
+    subscription_duration: dbMember.subscription_duration,
+    payment_status: dbMember.payment_status,
+    date_of_birth: dbMember.date_of_birth,
+    created_at: dbMember.created_at,
+    updated_at: dbMember.updated_at
+  };
+};
+
+// Helper function to transform frontend model to database format
+const transformMemberToDB = (member: Partial<Member>): any => {
+  const dbMember: any = {};
+  
+  if (member.fullName !== undefined) dbMember.full_name = member.fullName;
+  if (member.phone !== undefined) dbMember.phone = member.phone;
+  if (member.startDate !== undefined) dbMember.start_date = member.startDate;
+  if (member.subscriptionDuration !== undefined) dbMember.subscription_duration = member.subscriptionDuration;
+  if (member.paymentStatus !== undefined) dbMember.payment_status = member.paymentStatus;
+  if (member.dateOfBirth !== undefined) dbMember.date_of_birth = member.dateOfBirth;
+  if (member.deposit !== undefined) dbMember.deposit = member.deposit;
+  if (member.due !== undefined) dbMember.due = member.due;
+  if (member.description !== undefined) dbMember.description = member.description;
+  if (member.reminder_sent !== undefined) dbMember.reminder_sent = member.reminder_sent;
+  if (member.updatedAt !== undefined) dbMember.updated_at = member.updatedAt;
+  
+  // Also handle original snake_case properties if they exist
+  if (member.full_name !== undefined) dbMember.full_name = member.full_name;
+  if (member.start_date !== undefined) dbMember.start_date = member.start_date;
+  if (member.subscription_duration !== undefined) dbMember.subscription_duration = member.subscription_duration;
+  if (member.payment_status !== undefined) dbMember.payment_status = member.payment_status;
+  if (member.date_of_birth !== undefined) dbMember.date_of_birth = member.date_of_birth;
+  if (member.updated_at !== undefined) dbMember.updated_at = member.updated_at;
+  
+  return dbMember;
+};
+
 export function MemberProvider({ children }: { children: ReactNode }) {
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,7 +82,9 @@ export function MemberProvider({ children }: { children: ReactNode }) {
     setLoading(true);
     try {
       const fetchedMembers = await memberService.getMembers();
-      setMembers(fetchedMembers);
+      // Transform DB members to frontend format
+      const transformedMembers = fetchedMembers.map(transformMemberFromDB);
+      setMembers(transformedMembers);
     } catch (error) {
       console.error("Failed to fetch members:", error);
       toast.error("Could not load members");
@@ -49,16 +106,16 @@ export function MemberProvider({ children }: { children: ReactNode }) {
       console.log("Checking for expiring memberships...");
       
       const updatedMembers = [...members].map(member => {
-        const daysLeft = calculateDaysLeft(member.start_date, member.subscription_duration);
+        const daysLeft = calculateDaysLeft(member.startDate, member.subscriptionDuration);
         const memberStatus = getMemberStatus(member);
         let updatedMember = { ...member };
 
         // Automatically set payment status to "unpaid" if expired and status is "paid"
-        if (daysLeft < 0 && updatedMember.payment_status === "paid") {
-          updateMember(member.id, { payment_status: "unpaid" });
-          updatedMember.payment_status = "unpaid";
+        if (daysLeft < 0 && updatedMember.paymentStatus === "paid") {
+          updateMember(member.id, { paymentStatus: "unpaid" });
+          updatedMember.paymentStatus = "unpaid";
           toast.info(
-            `${updatedMember.full_name}'s payment status auto-updated to 'Unpaid' due to subscription expiry`
+            `${updatedMember.fullName}'s payment status auto-updated to 'Unpaid' due to subscription expiry`
           );
         }
 
@@ -66,19 +123,19 @@ export function MemberProvider({ children }: { children: ReactNode }) {
           let shouldUpdate = false;
           
           if (daysLeft === 7 && !updatedMember.reminder_sent.sevenDays) {
-            console.log(`Member ${member.full_name} has 7 days left in subscription`);
+            console.log(`Member ${member.fullName} has 7 days left in subscription`);
             updatedMember.reminder_sent.sevenDays = true;
             shouldUpdate = true;
           } 
           
           if (daysLeft === 3 && !updatedMember.reminder_sent.threeDays) {
-            console.log(`Member ${member.full_name} has 3 days left in subscription`);
+            console.log(`Member ${member.fullName} has 3 days left in subscription`);
             updatedMember.reminder_sent.threeDays = true;
             shouldUpdate = true;
           } 
           
           if (daysLeft === 1 && !updatedMember.reminder_sent.oneDay) {
-            console.log(`Member ${member.full_name} has 1 day left in subscription`);
+            console.log(`Member ${member.fullName} has 1 day left in subscription`);
             updatedMember.reminder_sent.oneDay = true;
             shouldUpdate = true;
           }
@@ -115,10 +172,14 @@ export function MemberProvider({ children }: { children: ReactNode }) {
       },
     };
 
-    const addedMember = await memberService.addMember(newMember);
+    // Transform to DB format before sending to API
+    const dbMember = transformMemberToDB(newMember);
+    const addedMember = await memberService.addMember(dbMember);
     
     if (addedMember) {
-      setMembers(prev => [addedMember, ...prev]);
+      // Transform back to frontend format
+      const transformedMember = transformMemberFromDB(addedMember);
+      setMembers(prev => [transformedMember, ...prev]);
     }
   };
 
@@ -135,12 +196,18 @@ export function MemberProvider({ children }: { children: ReactNode }) {
   };
 
   const updateMember = async (id: string, memberUpdate: Partial<Member>) => {
-    const updatedMember = await memberService.updateMember(id, memberUpdate);
+    // Convert to DB format
+    const dbMemberUpdate = transformMemberToDB(memberUpdate);
+    
+    const updatedMember = await memberService.updateMember(id, dbMemberUpdate);
     
     if (updatedMember) {
+      // Transform back to frontend format
+      const transformedMember = transformMemberFromDB(updatedMember);
+      
       setMembers(prev => 
         prev.map(member => 
-          member.id === id ? { ...member, ...updatedMember } : member
+          member.id === id ? { ...member, ...transformedMember } : member
         )
       );
     }

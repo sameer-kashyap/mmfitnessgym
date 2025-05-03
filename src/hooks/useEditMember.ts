@@ -99,8 +99,9 @@ export const useEditMember = (member: Member) => {
       }
     }
     
-    // Update using the snake_case properties that match database fields
-    updateMember(member.id, {
+    // Create update object with both snake_case and camelCase properties
+    const updateData = {
+      // Snake case for DB
       phone: formData.phone.trim(),
       subscription_duration: parseInt(formData.subscription_duration),
       payment_status: formData.payment_status as 'paid' | 'unpaid',
@@ -108,8 +109,17 @@ export const useEditMember = (member: Member) => {
       due: parseFloat(formData.due) || 0,
       date_of_birth: formattedDob,
       updated_at: now.toISOString(),
-      ...(resetStartDate && { start_date: now.toISOString() })
-    });
+      ...(resetStartDate && { start_date: now.toISOString() }),
+      
+      // Camel case for frontend
+      paymentStatus: formData.payment_status as 'paid' | 'unpaid',
+      subscriptionDuration: parseInt(formData.subscription_duration),
+      dateOfBirth: formattedDob,
+      updatedAt: now.toISOString(),
+      ...(resetStartDate && { startDate: now.toISOString() })
+    };
+    
+    updateMember(member.id, updateData);
     
     setIsOpen(false);
     toast.success("Member updated successfully");

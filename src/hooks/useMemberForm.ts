@@ -110,8 +110,9 @@ export const useMemberForm = () => {
         : undefined;
     }
 
-    // Create member with the snake_case properties that match database fields
-    addMember({
+    // Add both snake_case and camelCase properties to match Member type
+    const memberData = {
+      // Snake case for DB
       full_name: formData.full_name.trim(),
       phone: formData.phone.trim(),
       subscription_duration: parseInt(formData.subscription_duration),
@@ -120,9 +121,17 @@ export const useMemberForm = () => {
       start_date: format(parsedJoiningDate, "yyyy-MM-dd"),
       deposit: parseFloat(formData.deposit) || 0,
       due: parseFloat(formData.due) || 0,
-      description: formData.description?.trim()
-    });
+      description: formData.description?.trim(),
+      
+      // Camel case for frontend
+      fullName: formData.full_name.trim(),
+      startDate: format(parsedJoiningDate, "yyyy-MM-dd"),
+      subscriptionDuration: parseInt(formData.subscription_duration),
+      paymentStatus: formData.payment_status as 'paid' | 'unpaid',
+      dateOfBirth: formattedDob
+    };
 
+    addMember(memberData);
     setFormData(initialFormData);
   };
 

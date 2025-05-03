@@ -7,8 +7,8 @@ import { format, parse, isValid } from "date-fns";
 
 interface EditFormData {
   phone: string;
-  subscriptionDuration: string;
-  paymentStatus: string;
+  subscription_duration: string;
+  payment_status: string;
   deposit: string;
   due: string;
 }
@@ -21,15 +21,15 @@ export const useEditMember = (member: Member) => {
   const { updateMember } = useMembers();
   const [isOpen, setIsOpen] = useState(false);
   const [dateOfBirth, setDateOfBirth] = useState<string>(
-    member.dateOfBirth 
-      ? format(new Date(member.dateOfBirth), "dd/MM/yyyy") 
+    member.date_of_birth 
+      ? format(new Date(member.date_of_birth), "dd/MM/yyyy") 
       : ""
   );
   
   const [formData, setFormData] = useState<EditFormData>({
     phone: member.phone,
-    subscriptionDuration: member.subscriptionDuration.toString(),
-    paymentStatus: member.paymentStatus,
+    subscription_duration: member.subscription_duration.toString(),
+    payment_status: member.payment_status,
     deposit: member.deposit?.toString() || "0",
     due: member.due?.toString() || "0",
   });
@@ -88,7 +88,7 @@ export const useEditMember = (member: Member) => {
     }
 
     // Reset start date if subscription duration is changed
-    const resetStartDate = parseInt(formData.subscriptionDuration) !== member.subscriptionDuration;
+    const resetStartDate = parseInt(formData.subscription_duration) !== member.subscription_duration;
     const now = new Date();
     
     let formattedDob = undefined;
@@ -101,13 +101,13 @@ export const useEditMember = (member: Member) => {
     
     updateMember(member.id, {
       phone: formData.phone.trim(),
-      subscriptionDuration: parseInt(formData.subscriptionDuration),
-      paymentStatus: formData.paymentStatus as 'paid' | 'unpaid',
+      subscription_duration: parseInt(formData.subscription_duration),
+      payment_status: formData.payment_status as 'paid' | 'unpaid',
       deposit: parseFloat(formData.deposit) || 0,
       due: parseFloat(formData.due) || 0,
-      dateOfBirth: formattedDob,
-      updatedAt: now.toISOString(),
-      ...(resetStartDate && { startDate: now.toISOString() })
+      date_of_birth: formattedDob,
+      updated_at: now.toISOString(),
+      ...(resetStartDate && { start_date: now.toISOString() })
     });
     
     setIsOpen(false);

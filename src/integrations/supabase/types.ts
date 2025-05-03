@@ -48,6 +48,57 @@ export type Database = {
         }
         Relationships: []
       }
+      members: {
+        Row: {
+          created_at: string
+          date_of_birth: string | null
+          deposit: number | null
+          description: string | null
+          due: number | null
+          email: string | null
+          full_name: string
+          id: string
+          payment_status: string
+          phone: string
+          reminder_sent: Json | null
+          start_date: string
+          subscription_duration: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          date_of_birth?: string | null
+          deposit?: number | null
+          description?: string | null
+          due?: number | null
+          email?: string | null
+          full_name: string
+          id?: string
+          payment_status: string
+          phone: string
+          reminder_sent?: Json | null
+          start_date?: string
+          subscription_duration: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          date_of_birth?: string | null
+          deposit?: number | null
+          description?: string | null
+          due?: number | null
+          email?: string | null
+          full_name?: string
+          id?: string
+          payment_status?: string
+          phone?: string
+          reminder_sent?: Json | null
+          start_date?: string
+          subscription_duration?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

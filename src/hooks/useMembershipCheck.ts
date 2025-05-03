@@ -3,45 +3,52 @@ import { useEffect } from 'react';
 import { Member } from '../types/member';
 import { calculateDaysLeft, getMemberStatus } from '../lib/utils';
 import { toast } from "../components/ui/sonner";
+import { notificationService } from '../services/notificationService';
 
 export function useMembershipCheck(
   members: Member[], 
-  emailJSLoaded: boolean,
   setMembers: React.Dispatch<React.SetStateAction<Member[]>>
 ) {
-  const checkExpiringMemberships = () => {
-    // Email functionality is disabled since we're no longer collecting emails
+  const checkExpiringMemberships = async () => {
     console.log("Checking for expiring memberships...");
     
-    // We're not sending emails anymore, but we're keeping the status tracking
     const updatedMembers = [...members].map(member => {
-      const daysLeft = calculateDaysLeft(member.startDate, member.subscriptionDuration);
+      const daysLeft = calculateDaysLeft(member.start_date, member.subscription_duration);
       const memberStatus = getMemberStatus(member);
       let updatedMember = { ...member };
+      let shouldSendExpiryNotification = false;
 
       // Automatically set payment status to "unpaid" if expired and status is "paid"
-      if (daysLeft < 0 && updatedMember.paymentStatus === "paid") {
-        updatedMember.paymentStatus = "unpaid";
+      if (daysLeft < 0 && updatedMember.payment_status === "paid") {
+        updatedMember.payment_status = "unpaid";
         toast.info(
-          `${updatedMember.fullName}'s payment status auto-updated to 'Unpaid' due to subscription expiry`
+          `${updatedMember.full_name}'s payment status auto-updated to 'Unpaid' due to subscription expiry`
         );
       }
 
-      if (memberStatus === 'expiring-soon' && updatedMember.reminderSent) {
-        if (daysLeft === 7 && !updatedMember.reminderSent.sevenDays) {
-          console.log(`Member ${member.fullName} has 7 days left in subscription`);
-          updatedMember.reminderSent.sevenDays = true;
+      if (memberStatus === 'expiring-soon' && updatedMember.reminder_sent) {
+        if (daysLeft === 7 && !updatedMember.reminder_sent.sevenDays) {
+          console.log(`Member ${member.full_name} has 7 days left in subscription`);
+          updatedMember.reminder_sent.sevenDays = true;
+          shouldSendExpiryNotification = true;
         } 
         
-        if (daysLeft === 3 && !updatedMember.reminderSent.threeDays) {
-          console.log(`Member ${member.fullName} has 3 days left in subscription`);
-          updatedMember.reminderSent.threeDays = true;
+        if (daysLeft === 3 && !updatedMember.reminder_sent.threeDays) {
+          console.log(`Member ${member.full_name} has 3 days left in subscription`);
+          updatedMember.reminder_sent.threeDays = true;
+          shouldSendExpiryNotification = true;
         } 
         
-        if (daysLeft === 1 && !updatedMember.reminderSent.oneDay) {
-          console.log(`Member ${member.fullName} has 1 day left in subscription`);
-          updatedMember.reminderSent.oneDay = true;
+        if (daysLeft === 1 && !updatedMember.reminder_sent.oneDay) {
+          console.log(`Member ${member.full_name} has 1 day left in subscription`);
+          updatedMember.reminder_sent.oneDay = true;
+          shouldSendExpiryNotification = true;
         }
+      }
+      
+      // Send WhatsApp notification for expiring membership
+      if (shouldSendExpiryNotification) {
+        notificationService.sendExpiryAlert(updatedMember);
       }
 
       return updatedMember;
@@ -59,40 +66,8 @@ export function useMembershipCheck(
     // Check every hour
     const interval = setInterval(() => {
       checkExpiringMemberships();
-
-      // Check for expired memberships to remove
-      const filteredMembers = [...members].filter(member => {
-        const status = getMemberStatus(member);
-        return status !== 'expired';
-      });
-
-      if (filteredMembers.length !== members.length) {
-        toast.info(`${members.length - filteredMembers.length} expired member(s) have been automatically removed.`);
-        setMembers(filteredMembers);
-      }
     }, 60 * 60 * 1000);
 
-    // Schedule daily midnight check
-    const scheduleDailyCheck = () => {
-      const now = new Date();
-      const night = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate() + 1,
-        0, 0, 0
-      );
-      const timeUntilMidnight = night.getTime() - now.getTime();
-      
-      setTimeout(() => {
-        console.log("Running scheduled midnight membership check");
-        checkExpiringMemberships();
-        scheduleDailyCheck();
-      }, timeUntilMidnight);
-    };
-    
-    scheduleDailyCheck();
-
     return () => clearInterval(interval);
-  }, [members, emailJSLoaded]);
+  }, [members]);
 }
-

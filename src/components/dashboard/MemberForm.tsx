@@ -1,4 +1,5 @@
-import React from "react";
+
+import React, { useEffect } from "react";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { FormField } from "./member-form/FormField";
@@ -6,6 +7,8 @@ import { PaymentStatusSelect } from "./member-form/PaymentStatusSelect";
 import { useMemberForm } from "@/hooks/useMemberForm";
 import { Textarea } from "../ui/textarea";
 import { Label } from "../ui/label";
+import { notificationService } from "@/services/notificationService";
+import { useMembers } from "@/context/MemberContext";
 
 const MemberForm: React.FC = () => {
   const {
@@ -15,6 +18,17 @@ const MemberForm: React.FC = () => {
     handleSelectChange,
     handleSubmit
   } = useMemberForm();
+  
+  const { members } = useMembers();
+
+  // Setup WhatsApp notification for new members
+  useEffect(() => {
+    const lastAddedMember = members[0];
+    if (lastAddedMember && new Date(lastAddedMember.created_at || '').getTime() > Date.now() - 5000) {
+      // Send WhatsApp notification for new member (only for recently added members)
+      notificationService.sendNewMemberAlert(lastAddedMember);
+    }
+  }, [members]);
 
   // Calculate total (deposit + due)
   const total = parseFloat(formData.deposit || "0") + parseFloat(formData.due || "0");

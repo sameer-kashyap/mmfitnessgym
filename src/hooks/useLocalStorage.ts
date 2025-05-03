@@ -1,4 +1,5 @@
-
+// This hook is no longer needed since we're using Supabase
+// We'll keep it for reference but with minimal functionality
 import { useEffect } from 'react';
 import { Member } from '../types/member';
 
@@ -6,9 +7,6 @@ export function useLocalStorage(
   members: Member[],
   loading: boolean
 ) {
-  useEffect(() => {
-    if (!loading) {
-      localStorage.setItem("gym-members", JSON.stringify(members));
-    }
-  }, [members, loading]);
+  // No-op as we're now using Supabase for persistence
+  // This is kept only for backward compatibility
 }

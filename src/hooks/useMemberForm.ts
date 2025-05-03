@@ -5,41 +5,41 @@ import { parse, isValid, format } from "date-fns";
 import { toast } from "@/components/ui/sonner";
 
 interface FormData {
-  fullName: string;
+  full_name: string;
   phone: string;
-  subscriptionDuration: string;
-  paymentStatus: string;
-  dateOfBirth: string;
-  joiningDate: string;
+  subscription_duration: string;
+  payment_status: string;
+  date_of_birth: string;
+  joining_date: string;
   deposit: string;
   due: string;
   description?: string;
 }
 
 interface FormErrors {
-  fullName: boolean;
+  full_name: boolean;
   phone: boolean;
-  dateOfBirth: boolean;
-  joiningDate: boolean;
+  date_of_birth: boolean;
+  joining_date: boolean;
 }
 
 const initialFormData: FormData = {
-  fullName: "",
+  full_name: "",
   phone: "",
-  subscriptionDuration: "30",
-  paymentStatus: "paid",
-  dateOfBirth: "",
-  joiningDate: "",
+  subscription_duration: "30",
+  payment_status: "paid",
+  date_of_birth: "",
+  joining_date: "",
   deposit: "0",
   due: "0",
   description: "",
 };
 
 const initialFormErrors: FormErrors = {
-  fullName: false,
+  full_name: false,
   phone: false,
-  dateOfBirth: false,
-  joiningDate: false,
+  date_of_birth: false,
+  joining_date: false,
 };
 
 export const useMemberForm = () => {
@@ -83,10 +83,10 @@ export const useMemberForm = () => {
 
   const validateForm = (): boolean => {
     const newFormErrors = {
-      fullName: formData.fullName.trim() === "",
+      full_name: formData.full_name.trim() === "",
       phone: !validatePhone(formData.phone),
-      dateOfBirth: !validateDateOfBirth(formData.dateOfBirth),
-      joiningDate: !validateJoiningDate(formData.joiningDate),
+      date_of_birth: !validateDateOfBirth(formData.date_of_birth),
+      joining_date: !validateJoiningDate(formData.joining_date),
     };
     setFormErrors(newFormErrors);
     return !Object.values(newFormErrors).some(error => error);
@@ -100,11 +100,11 @@ export const useMemberForm = () => {
       return;
     }
 
-    const parsedJoiningDate = parse(formData.joiningDate, 'dd/MM/yyyy', new Date());
+    const parsedJoiningDate = parse(formData.joining_date, 'dd/MM/yyyy', new Date());
 
     let formattedDob = undefined;
-    if (formData.dateOfBirth?.trim()) {
-      const parsedDob = parse(formData.dateOfBirth, 'dd/MM/yyyy', new Date());
+    if (formData.date_of_birth?.trim()) {
+      const parsedDob = parse(formData.date_of_birth, 'dd/MM/yyyy', new Date());
       formattedDob = isValid(parsedDob)
         ? format(parsedDob, "yyyy-MM-dd")
         : undefined;
@@ -113,17 +113,15 @@ export const useMemberForm = () => {
     const now = new Date();
 
     addMember({
-      fullName: formData.fullName.trim(),
+      full_name: formData.full_name.trim(),
       phone: formData.phone.trim(),
-      subscriptionDuration: parseInt(formData.subscriptionDuration),
-      paymentStatus: formData.paymentStatus as 'paid' | 'unpaid',
-      dateOfBirth: formattedDob,
-      startDate: format(parsedJoiningDate, "yyyy-MM-dd"),
+      subscription_duration: parseInt(formData.subscription_duration),
+      payment_status: formData.payment_status as 'paid' | 'unpaid',
+      date_of_birth: formattedDob,
+      start_date: format(parsedJoiningDate, "yyyy-MM-dd"),
       deposit: parseFloat(formData.deposit) || 0,
       due: parseFloat(formData.due) || 0,
-      description: formData.description?.trim(),
-      createdAt: now.toISOString(),
-      updatedAt: now.toISOString()
+      description: formData.description?.trim()
     });
 
     setFormData(initialFormData);

@@ -3,6 +3,7 @@ import React from "react";
 import { Separator } from "../ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
+import { Button } from "../ui/button"; // Add this import for the Button component
 import { useMembers } from "../../context/MemberContext";
 import { UserCheck, Clock, AlertTriangle, Plus, Users, IndianRupee, BarChart3, Settings } from "lucide-react";
 import { AddMemberSection } from "./sections/AddMemberSection";

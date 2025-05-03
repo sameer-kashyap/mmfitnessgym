@@ -20,8 +20,6 @@ export interface Member {
   subscription_duration: number;
   payment_status: 'paid' | 'unpaid';
   date_of_birth?: string;
-  email?: string;
-  description?: string;
   deposit?: number;
   due?: number;
   created_at?: string;

@@ -28,27 +28,20 @@ serve(async (req) => {
     }
     
     console.log(`Message content: ${messageContent}`);
+    console.log(`Sending to phone number: ${phoneNumber}`);
     
-    // Get API tokens from environment variables
-    const ultramsgToken = Deno.env.get("ULTRAMSG_TOKEN");
-    const ultramsgInstanceId = Deno.env.get("ULTRAMSG_INSTANCE_ID");
+    // Format the phone number (remove leading + if present)
+    const formattedPhone = phoneNumber.replace(/^\+/, "");
     
-    console.log("UltraMsg credentials available:", !!ultramsgToken && !!ultramsgInstanceId);
-    
-    if (!ultramsgToken || !ultramsgInstanceId) {
-      throw new Error("UltraMsg credentials not found in environment variables");
-    }
-
-    // Send the actual message to UltraMsg API
-    const response = await fetch(`https://api.ultramsg.com/${ultramsgInstanceId}/messages/chat`, {
+    // Send the message using the Baileys API endpoint
+    const response = await fetch("https://baileys-bot-production.up.railway.app/", {
       method: "POST",
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
+        "Content-Type": "application/json"
       },
-      body: new URLSearchParams({
-        token: ultramsgToken,
-        to: phoneNumber.replace(/^\+/, ""),  // Remove leading + if present
-        body: messageContent
+      body: JSON.stringify({
+        phone: formattedPhone,
+        message: messageContent
       })
     });
 

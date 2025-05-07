@@ -74,52 +74,105 @@ export type Database = {
       }
       members: {
         Row: {
-          created_at: string
-          date_of_birth: string | null
-          deposit: number | null
-          description: string | null
-          due: number | null
-          email: string | null
+          created_at: string | null
           full_name: string
           id: string
-          payment_status: string
-          phone: string
-          reminder_sent: Json | null
-          start_date: string
-          subscription_duration: number
-          updated_at: string
+          phone_number: string | null
+          subscription_end: string | null
+          subscription_start: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          full_name: string
+          id?: string
+          phone_number?: string | null
+          subscription_end?: string | null
+          subscription_start?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          full_name?: string
+          id?: string
+          phone_number?: string | null
+          subscription_end?: string | null
+          subscription_start?: string | null
+        }
+        Relationships: []
+      }
+      reminders: {
+        Row: {
+          created_at: string
+          id: number
+          member_id: string
+          message: string
+          phone_number: string
+          send_at: string
+          sent_at: string | null
+          status: string
         }
         Insert: {
           created_at?: string
-          date_of_birth?: string | null
-          deposit?: number | null
-          description?: string | null
-          due?: number | null
-          email?: string | null
-          full_name: string
-          id?: string
-          payment_status: string
-          phone: string
-          reminder_sent?: Json | null
-          start_date?: string
-          subscription_duration: number
-          updated_at?: string
+          id?: number
+          member_id: string
+          message: string
+          phone_number: string
+          send_at: string
+          sent_at?: string | null
+          status?: string
         }
         Update: {
           created_at?: string
-          date_of_birth?: string | null
-          deposit?: number | null
-          description?: string | null
-          due?: number | null
-          email?: string | null
-          full_name?: string
-          id?: string
-          payment_status?: string
-          phone?: string
-          reminder_sent?: Json | null
-          start_date?: string
-          subscription_duration?: number
-          updated_at?: string
+          id?: number
+          member_id?: string
+          message?: string
+          phone_number?: string
+          send_at?: string
+          sent_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reminders_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      Reminders: {
+        Row: {
+          created_at: string
+          id: number
+          member_id: string | null
+          message: string | null
+          phone_number: string | null
+          send_at: string | null
+          sent: boolean | null
+          sent_at: string | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          member_id?: string | null
+          message?: string | null
+          phone_number?: string | null
+          send_at?: string | null
+          sent?: boolean | null
+          sent_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          member_id?: string | null
+          message?: string | null
+          phone_number?: string | null
+          send_at?: string | null
+          sent?: boolean | null
+          sent_at?: string | null
+          status?: string | null
         }
         Relationships: []
       }

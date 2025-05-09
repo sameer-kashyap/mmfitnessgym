@@ -24,7 +24,6 @@ export const transformMemberFromDB = (dbMember: any): Member => {
     start_date: dbMember.joining_date,
     subscription_duration: dbMember.subscription_duration,
     payment_status: dbMember.payment_status,
-    joining_date: dbMember.joining_date,
     date_of_birth: dbMember.dob, // Map from dob to date_of_birth
     deposit: dbMember.deposit,
     due: dbMember.due,
@@ -51,10 +50,10 @@ export const transformMemberToDB = (member: Partial<Member>): any => {
   // Map all relevant fields to snake_case for DB
   if (member.fullName || member.full_name) dbMember.full_name = member.fullName || member.full_name;
   if (member.phone) dbMember.phone = member.phone;
-  if (member.startDate || member.start_date) dbMember.joining_date = member.startDate || member.joining_date || member.start_date;
+  if (member.startDate || member.start_date) dbMember.joining_date = member.startDate || member.start_date;
   if (member.subscriptionDuration || member.subscription_duration) dbMember.subscription_duration = member.subscriptionDuration || member.subscription_duration;
   if (member.paymentStatus || member.payment_status) dbMember.payment_status = member.paymentStatus || member.payment_status;
-  if (member.dateOfBirth || member.date_of_birth) dbMember.dob = member.dateOfBirth || member.date_of_birth || member.dob;
+  if (member.dateOfBirth || member.date_of_birth) dbMember.dob = member.dateOfBirth || member.date_of_birth;
   if (member.description) dbMember.description = member.description;
   if (member.deposit) dbMember.deposit = member.deposit;
   if (member.due) dbMember.due = member.due;

@@ -1,6 +1,6 @@
 
 import React from "react";
-import { MemberProvider } from "../context/MemberContext";
+import { MemberProvider } from "../context/member/MemberProvider";
 import Dashboard from "../components/dashboard/Dashboard";
 
 const Index = () => {

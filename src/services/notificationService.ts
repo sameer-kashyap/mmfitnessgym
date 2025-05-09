@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { Member } from "@/types/member";
@@ -19,7 +18,7 @@ export const notificationService = {
       const { data, error } = await supabase.functions.invoke('send-whatsapp', {
         body: {
           memberName: member.full_name || member.fullName,
-          phoneNumber: member.phone, // Use phone property directly as per Member interface
+          phoneNumber: member.phone, // Use phone property from Member interface
           messageType: 'new-member'
         }
       });
@@ -58,7 +57,7 @@ export const notificationService = {
       const { data, error } = await supabase.functions.invoke('send-whatsapp', {
         body: {
           memberName: member.full_name || member.fullName,
-          phoneNumber: member.phone, // Use phone property directly as per Member interface
+          phoneNumber: member.phone, // Use phone property from Member interface
           messageType: 'expiry',
           expiryDate: formattedExpiryDate
         }

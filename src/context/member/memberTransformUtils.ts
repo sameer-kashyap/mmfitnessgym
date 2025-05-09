@@ -58,6 +58,7 @@ export const transformMemberToDB = (member: Partial<Member>): any => {
   if (member.deposit) dbMember.deposit = member.deposit;
   if (member.due) dbMember.due = member.due;
   if (member.reminder_sent) dbMember.reminder_sent = member.reminder_sent;
+  if (member.email) dbMember.email = member.email;
   
   return dbMember;
 };

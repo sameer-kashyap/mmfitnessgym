@@ -113,17 +113,28 @@ export const useMemberForm = () => {
         : undefined;
     }
 
-    // Create a member data object with snake_case keys for the database
+    // Create a member data object that includes both camelCase and snake_case properties
+    // to satisfy the Member type requirements
     const memberData = {
-      full_name: formData.full_name.trim(),
+      // CamelCase properties for frontend
+      fullName: formData.full_name.trim(),
       phone: formData.phone.trim(),
+      startDate: formattedJoiningDate,
+      subscriptionDuration: parseInt(formData.subscription_duration),
+      paymentStatus: formData.payment_status as 'paid' | 'unpaid',
+      dateOfBirth: formattedDob,
+      description: formData.description?.trim(),
+      
+      // Snake_case properties for database
+      full_name: formData.full_name.trim(),
+      start_date: formattedJoiningDate,
+      joining_date: formattedJoiningDate,
       subscription_duration: parseInt(formData.subscription_duration),
       payment_status: formData.payment_status as 'paid' | 'unpaid',
-      dob: formattedDob, // Changed from date_of_birth to dob to match DB schema
-      joining_date: formattedJoiningDate, // Changed from start_date to joining_date
+      date_of_birth: formattedDob,
+      dob: formattedDob,
       deposit: parseFloat(formData.deposit) || 0,
       due: parseFloat(formData.due) || 0,
-      description: formData.description?.trim(),
     };
 
     console.log("Submitting member data:", memberData);

@@ -10,10 +10,10 @@ export const transformMemberFromDB = (dbMember: any): Member => {
     // CamelCase (frontend) properties
     fullName: dbMember.full_name,
     phone: dbMember.phone,
-    startDate: dbMember.joining_date,
+    startDate: dbMember.joining_date || dbMember.start_date,
     subscriptionDuration: dbMember.subscription_duration,
     paymentStatus: dbMember.payment_status,
-    dateOfBirth: dbMember.dob, // Map from dob to dateOfBirth
+    dateOfBirth: dbMember.dob || dbMember.date_of_birth, // Map from dob to dateOfBirth
     description: dbMember.description,
     email: dbMember.email,
     createdAt: dbMember.created_at,
@@ -21,10 +21,10 @@ export const transformMemberFromDB = (dbMember: any): Member => {
     
     // Snake_case (DB) properties
     full_name: dbMember.full_name,
-    start_date: dbMember.joining_date,
+    start_date: dbMember.joining_date || dbMember.start_date,
     subscription_duration: dbMember.subscription_duration,
     payment_status: dbMember.payment_status,
-    date_of_birth: dbMember.dob, // Map from dob to date_of_birth
+    date_of_birth: dbMember.dob || dbMember.date_of_birth, // Map from dob to date_of_birth
     deposit: dbMember.deposit,
     due: dbMember.due,
     created_at: dbMember.created_at,

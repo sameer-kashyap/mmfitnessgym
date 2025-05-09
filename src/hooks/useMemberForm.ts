@@ -101,6 +101,9 @@ export const useMemberForm = () => {
     }
 
     const parsedJoiningDate = parse(formData.joining_date, 'dd/MM/yyyy', new Date());
+    
+    // Format the joining_date for database insertion (YYYY-MM-DD)
+    const formattedJoiningDate = format(parsedJoiningDate, "yyyy-MM-dd");
 
     let formattedDob = undefined;
     if (formData.date_of_birth?.trim()) {
@@ -110,27 +113,20 @@ export const useMemberForm = () => {
         : undefined;
     }
 
-    // Add both snake_case and camelCase properties to match Member type
+    // Create a member data object with snake_case keys for the database
     const memberData = {
-      // Snake case for DB
       full_name: formData.full_name.trim(),
       phone: formData.phone.trim(),
       subscription_duration: parseInt(formData.subscription_duration),
       payment_status: formData.payment_status as 'paid' | 'unpaid',
-      date_of_birth: formattedDob,
-      start_date: format(parsedJoiningDate, "yyyy-MM-dd"),
+      dob: formattedDob, // Changed from date_of_birth to dob to match DB schema
+      joining_date: formattedJoiningDate, // Changed from start_date to joining_date
       deposit: parseFloat(formData.deposit) || 0,
       due: parseFloat(formData.due) || 0,
       description: formData.description?.trim(),
-      
-      // Camel case for frontend
-      fullName: formData.full_name.trim(),
-      startDate: format(parsedJoiningDate, "yyyy-MM-dd"),
-      subscriptionDuration: parseInt(formData.subscription_duration),
-      paymentStatus: formData.payment_status as 'paid' | 'unpaid',
-      dateOfBirth: formattedDob
     };
 
+    console.log("Submitting member data:", memberData);
     addMember(memberData);
     setFormData(initialFormData);
   };

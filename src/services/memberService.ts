@@ -12,6 +12,7 @@ export const memberService = {
         .order('created_at', { ascending: false });
 
       if (error) {
+        console.error("Error fetching members:", error);
         throw error;
       }
 
@@ -38,6 +39,13 @@ export const memberService = {
         memberToInsert.joining_date = memberToInsert.startDate;
       }
 
+      // Remove redundant camelCase properties to avoid conflicts
+      delete memberToInsert.fullName;
+      delete memberToInsert.dateOfBirth;
+      delete memberToInsert.startDate;
+      delete memberToInsert.subscriptionDuration;
+      delete memberToInsert.paymentStatus;
+
       console.log('Inserting member with data:', memberToInsert);
 
       const { data, error } = await supabase
@@ -47,14 +55,15 @@ export const memberService = {
         .maybeSingle();
 
       if (error) {
+        console.error("Supabase error adding member:", error);
         throw error;
       }
 
       toast.success(`${member.full_name} has been added as a member`);
       return data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding member:', error);
-      toast.error('Failed to add member');
+      toast.error(`Failed to add member: ${error.message || 'Unknown error'}`);
       return null;
     }
   },
@@ -73,6 +82,13 @@ export const memberService = {
       if (updatesToApply.startDate && !updatesToApply.joining_date) {
         updatesToApply.joining_date = updatesToApply.startDate;
       }
+      
+      // Remove redundant camelCase properties to avoid conflicts
+      delete updatesToApply.fullName;
+      delete updatesToApply.dateOfBirth;
+      delete updatesToApply.startDate;
+      delete updatesToApply.subscriptionDuration;
+      delete updatesToApply.paymentStatus;
 
       const { data, error } = await supabase
         .from('members')
@@ -82,14 +98,15 @@ export const memberService = {
         .maybeSingle();
 
       if (error) {
+        console.error("Supabase error updating member:", error);
         throw error;
       }
 
       toast.success('Member details updated');
       return data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating member:', error);
-      toast.error('Failed to update member');
+      toast.error(`Failed to update member: ${error.message || 'Unknown error'}`);
       return null;
     }
   },
@@ -102,14 +119,15 @@ export const memberService = {
         .eq('id', id);
 
       if (error) {
+        console.error("Supabase error deleting member:", error);
         throw error;
       }
 
       toast.success('Member has been removed');
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting member:', error);
-      toast.error('Failed to delete member');
+      toast.error(`Failed to delete member: ${error.message || 'Unknown error'}`);
       return false;
     }
   },

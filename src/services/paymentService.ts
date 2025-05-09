@@ -1,11 +1,12 @@
 
-import { fromTable } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/sonner";
 
 export const paymentService = {
   async getPayments(): Promise<any[]> {
     try {
-      const { data, error } = await fromTable('payments')
+      const { data, error } = await supabase
+        .from('payments')
         .select('*, members(full_name)')
         .order('created_at', { ascending: false });
 
@@ -23,8 +24,8 @@ export const paymentService = {
 
   async getPaymentsByMember(memberId: string): Promise<any[]> {
     try {
-      // Replace single() with select() to avoid infinite type instantiation
-      const { data, error } = await fromTable('payments')
+      const { data, error } = await supabase
+        .from('payments')
         .select('*')
         .eq('member_id', memberId)
         .order('created_at', { ascending: false });
@@ -43,9 +44,10 @@ export const paymentService = {
 
   async addPayment(payment: any): Promise<any | null> {
     try {
-      const { data, error } = await fromTable('payments')
+      const { data, error } = await supabase
+        .from('payments')
         .insert([payment])
-        .select('*')
+        .select()
         .maybeSingle();
 
       if (error) {
@@ -63,10 +65,11 @@ export const paymentService = {
 
   async updatePayment(id: string, updates: any): Promise<any | null> {
     try {
-      const { data, error } = await fromTable('payments')
+      const { data, error } = await supabase
+        .from('payments')
         .update(updates)
         .eq('id', id)
-        .select('*')
+        .select()
         .maybeSingle();
 
       if (error) {
@@ -84,7 +87,8 @@ export const paymentService = {
 
   async deletePayment(id: string): Promise<boolean> {
     try {
-      const { error } = await fromTable('payments')
+      const { error } = await supabase
+        .from('payments')
         .delete()
         .eq('id', id);
 

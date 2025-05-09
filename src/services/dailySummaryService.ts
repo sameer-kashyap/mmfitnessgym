@@ -1,11 +1,12 @@
 
-import { fromTable } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/sonner";
 
 export const dailySummaryService = {
   async getDailySummaries(): Promise<any[]> {
     try {
-      const { data, error } = await fromTable('daily_summary')
+      const { data, error } = await supabase
+        .from('daily_summary')
         .select('*')
         .order('date', { ascending: false });
 
@@ -24,7 +25,8 @@ export const dailySummaryService = {
   async getDailySummaryByDate(date: string): Promise<any | null> {
     try {
       // Use maybeSingle instead of single to handle the case where no rows are returned
-      const { data, error } = await fromTable('daily_summary')
+      const { data, error } = await supabase
+        .from('daily_summary')
         .select('*')
         .eq('date', date)
         .maybeSingle();
@@ -43,10 +45,11 @@ export const dailySummaryService = {
 
   async addDailySummary(summary: any): Promise<any | null> {
     try {
-      const { data, error } = await fromTable('daily_summary')
+      const { data, error } = await supabase
+        .from('daily_summary')
         .insert([summary])
-        .select('*')
-        .single();
+        .select()
+        .maybeSingle();
 
       if (error) {
         throw error;
@@ -63,10 +66,11 @@ export const dailySummaryService = {
 
   async updateDailySummary(id: string, updates: any): Promise<any | null> {
     try {
-      const { data, error } = await fromTable('daily_summary')
+      const { data, error } = await supabase
+        .from('daily_summary')
         .update(updates)
         .eq('id', id)
-        .select('*')
+        .select()
         .maybeSingle();
 
       if (error) {
@@ -84,7 +88,8 @@ export const dailySummaryService = {
 
   async deleteDailySummary(id: string): Promise<boolean> {
     try {
-      const { error } = await fromTable('daily_summary')
+      const { error } = await supabase
+        .from('daily_summary')
         .delete()
         .eq('id', id);
 

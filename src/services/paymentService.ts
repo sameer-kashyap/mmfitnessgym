@@ -23,6 +23,7 @@ export const paymentService = {
 
   async getPaymentsByMember(memberId: string): Promise<any[]> {
     try {
+      // Replace single() with select() to avoid infinite type instantiation
       const { data, error } = await fromTable('payments')
         .select('*')
         .eq('member_id', memberId)
@@ -45,7 +46,7 @@ export const paymentService = {
       const { data, error } = await fromTable('payments')
         .insert([payment])
         .select('*')
-        .single();
+        .maybeSingle();
 
       if (error) {
         throw error;
@@ -66,7 +67,7 @@ export const paymentService = {
         .update(updates)
         .eq('id', id)
         .select('*')
-        .single();
+        .maybeSingle();
 
       if (error) {
         throw error;

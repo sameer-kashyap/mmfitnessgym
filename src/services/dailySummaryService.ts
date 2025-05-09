@@ -23,12 +23,13 @@ export const dailySummaryService = {
 
   async getDailySummaryByDate(date: string): Promise<any | null> {
     try {
+      // Use maybeSingle instead of single to handle the case where no rows are returned
       const { data, error } = await fromTable('daily_summary')
         .select('*')
         .eq('date', date)
-        .single();
+        .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') { // PGRST116 is "No rows returned" error
+      if (error) {
         throw error;
       }
 
@@ -66,7 +67,7 @@ export const dailySummaryService = {
         .update(updates)
         .eq('id', id)
         .select('*')
-        .single();
+        .maybeSingle();
 
       if (error) {
         throw error;

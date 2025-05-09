@@ -1,0 +1,107 @@
+
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/components/ui/sonner";
+
+export const dailySummaryService = {
+  async getDailySummaries(): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('daily_summary')
+        .select('*')
+        .order('date', { ascending: false });
+
+      if (error) {
+        throw error;
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error fetching daily summaries:', error);
+      toast.error('Failed to fetch daily summaries');
+      return [];
+    }
+  },
+
+  async getDailySummaryByDate(date: string): Promise<any | null> {
+    try {
+      const { data, error } = await supabase
+        .from('daily_summary')
+        .select('*')
+        .eq('date', date)
+        .single();
+
+      if (error && error.code !== 'PGRST116') { // PGRST116 is "No rows returned" error
+        throw error;
+      }
+
+      return data || null;
+    } catch (error) {
+      console.error('Error fetching daily summary:', error);
+      toast.error('Failed to fetch daily summary');
+      return null;
+    }
+  },
+
+  async addDailySummary(summary: any): Promise<any | null> {
+    try {
+      const { data, error } = await supabase
+        .from('daily_summary')
+        .insert([summary])
+        .select('*')
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      toast.success('Daily summary has been recorded');
+      return data;
+    } catch (error) {
+      console.error('Error adding daily summary:', error);
+      toast.error('Failed to record daily summary');
+      return null;
+    }
+  },
+
+  async updateDailySummary(id: number, updates: any): Promise<any | null> {
+    try {
+      const { data, error } = await supabase
+        .from('daily_summary')
+        .update(updates)
+        .eq('id', id)
+        .select('*')
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      toast.success('Daily summary has been updated');
+      return data;
+    } catch (error) {
+      console.error('Error updating daily summary:', error);
+      toast.error('Failed to update daily summary');
+      return null;
+    }
+  },
+
+  async deleteDailySummary(id: number): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('daily_summary')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        throw error;
+      }
+
+      toast.success('Daily summary has been deleted');
+      return true;
+    } catch (error) {
+      console.error('Error deleting daily summary:', error);
+      toast.error('Failed to delete daily summary');
+      return false;
+    }
+  },
+};

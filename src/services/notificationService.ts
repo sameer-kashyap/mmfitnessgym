@@ -18,8 +18,8 @@ export const notificationService = {
 
       const { data, error } = await supabase.functions.invoke('send-whatsapp', {
         body: {
-          memberName: member.full_name,
-          phoneNumber: member.phone,
+          memberName: member.full_name || member.fullName,
+          phoneNumber: member.phone || member.phone_number,
           messageType: 'new-member'
         }
       });
@@ -49,16 +49,16 @@ export const notificationService = {
       }
       
       // Calculate expiry date
-      const startDate = new Date(member.start_date);
+      const startDate = new Date(member.start_date || member.startDate);
       const expiryDate = new Date(startDate);
-      expiryDate.setDate(expiryDate.getDate() + member.subscription_duration);
+      expiryDate.setDate(expiryDate.getDate() + (member.subscription_duration || member.subscriptionDuration));
       
       const formattedExpiryDate = format(expiryDate, 'dd/MM/yyyy');
       
       const { data, error } = await supabase.functions.invoke('send-whatsapp', {
         body: {
-          memberName: member.full_name,
-          phoneNumber: member.phone,
+          memberName: member.full_name || member.fullName,
+          phoneNumber: member.phone || member.phone_number,
           messageType: 'expiry',
           expiryDate: formattedExpiryDate
         }

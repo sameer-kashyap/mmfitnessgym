@@ -9,170 +9,105 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      admin_users: {
+      daily_summary: {
         Row: {
-          auth_id: string | null
-          created_at: string
-          email: string
+          date: string
           id: string
-          updated_at: string
+          new_members: number | null
+          notes: string | null
+          total_collected: number | null
         }
         Insert: {
-          auth_id?: string | null
-          created_at?: string
-          email: string
+          date: string
           id?: string
-          updated_at?: string
+          new_members?: number | null
+          notes?: string | null
+          total_collected?: number | null
         }
         Update: {
-          auth_id?: string | null
-          created_at?: string
-          email?: string
+          date?: string
           id?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      member: {
-        Row: {
-          descriptiion: string | null
-          due_amount: number | null
-          follow_up_date: string | null
-          full_name: string
-          id: string
-          joining_date: string | null
-          payment_status: string | null
-          phone_number: string | null
-          subscription_duration: number | null
-          subscription_end_date: string | null
-        }
-        Insert: {
-          descriptiion?: string | null
-          due_amount?: number | null
-          follow_up_date?: string | null
-          full_name: string
-          id?: string
-          joining_date?: string | null
-          payment_status?: string | null
-          phone_number?: string | null
-          subscription_duration?: number | null
-          subscription_end_date?: string | null
-        }
-        Update: {
-          descriptiion?: string | null
-          due_amount?: number | null
-          follow_up_date?: string | null
-          full_name?: string
-          id?: string
-          joining_date?: string | null
-          payment_status?: string | null
-          phone_number?: string | null
-          subscription_duration?: number | null
-          subscription_end_date?: string | null
+          new_members?: number | null
+          notes?: string | null
+          total_collected?: number | null
         }
         Relationships: []
       }
       members: {
         Row: {
           created_at: string | null
+          deposit: number | null
+          description: string | null
+          dob: string | null
+          due: number | null
+          follow_up_date: string | null
           full_name: string
           id: string
-          phone_number: string | null
-          subscription_end: string | null
-          subscription_start: string | null
+          joining_date: string
+          payment_status: string | null
+          phone: string
+          subscription_duration: number
+          subscription_expiry: string | null
+          updated_at: string | null
         }
         Insert: {
           created_at?: string | null
+          deposit?: number | null
+          description?: string | null
+          dob?: string | null
+          due?: number | null
+          follow_up_date?: string | null
           full_name: string
           id?: string
-          phone_number?: string | null
-          subscription_end?: string | null
-          subscription_start?: string | null
+          joining_date: string
+          payment_status?: string | null
+          phone: string
+          subscription_duration: number
+          subscription_expiry?: string | null
+          updated_at?: string | null
         }
         Update: {
           created_at?: string | null
+          deposit?: number | null
+          description?: string | null
+          dob?: string | null
+          due?: number | null
+          follow_up_date?: string | null
           full_name?: string
           id?: string
-          phone_number?: string | null
-          subscription_end?: string | null
-          subscription_start?: string | null
+          joining_date?: string
+          payment_status?: string | null
+          phone?: string
+          subscription_duration?: number
+          subscription_expiry?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }
-      reminders: {
+      payments: {
         Row: {
-          created_at: string
-          id: number
-          member_id: string
-          message: string
-          phone_number: string
-          send_at: string
-          sent_at: string | null
-          status: string
-        }
-        Insert: {
-          created_at?: string
-          id?: number
-          member_id: string
-          message: string
-          phone_number: string
-          send_at: string
-          sent_at?: string | null
-          status?: string
-        }
-        Update: {
-          created_at?: string
-          id?: number
-          member_id?: string
-          message?: string
-          phone_number?: string
-          send_at?: string
-          sent_at?: string | null
-          status?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "reminders_member_id_fkey"
-            columns: ["member_id"]
-            isOneToOne: false
-            referencedRelation: "members"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      Reminders: {
-        Row: {
-          created_at: string
-          id: number
+          amount: number
+          id: string
           member_id: string | null
-          message: string | null
-          phone_number: string | null
-          send_at: string | null
-          sent: boolean | null
-          sent_at: string | null
-          status: string | null
+          mode: string | null
+          note: string | null
+          payment_date: string | null
         }
         Insert: {
-          created_at?: string
-          id?: number
+          amount: number
+          id?: string
           member_id?: string | null
-          message?: string | null
-          phone_number?: string | null
-          send_at?: string | null
-          sent?: boolean | null
-          sent_at?: string | null
-          status?: string | null
+          mode?: string | null
+          note?: string | null
+          payment_date?: string | null
         }
         Update: {
-          created_at?: string
-          id?: number
+          amount?: number
+          id?: string
           member_id?: string | null
-          message?: string | null
-          phone_number?: string | null
-          send_at?: string | null
-          sent?: boolean | null
-          sent_at?: string | null
-          status?: string | null
+          mode?: string | null
+          note?: string | null
+          payment_date?: string | null
         }
         Relationships: []
       }

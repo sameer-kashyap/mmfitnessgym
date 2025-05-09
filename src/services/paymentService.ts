@@ -60,7 +60,7 @@ export const paymentService = {
     }
   },
 
-  async updatePayment(id: number, updates: any): Promise<any | null> {
+  async updatePayment(id: string, updates: any): Promise<any | null> {
     try {
       const { data, error } = await fromTable('payments')
         .update(updates)
@@ -81,7 +81,7 @@ export const paymentService = {
     }
   },
 
-  async deletePayment(id: number): Promise<boolean> {
+  async deletePayment(id: string): Promise<boolean> {
     try {
       const { error } = await fromTable('payments')
         .delete()

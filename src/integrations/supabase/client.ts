@@ -12,4 +12,7 @@ const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
 // Helper function to make table access easier and more consistent
-export const fromTable = (tableName: string) => supabase.from(tableName);
+// This uses type assertion to bypass the strict type checking
+export const fromTable = (tableName: "daily_summary" | "members" | "payments") => {
+  return supabase.from(tableName);
+};

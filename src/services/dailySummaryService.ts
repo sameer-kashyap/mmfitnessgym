@@ -60,7 +60,7 @@ export const dailySummaryService = {
     }
   },
 
-  async updateDailySummary(id: number, updates: any): Promise<any | null> {
+  async updateDailySummary(id: string, updates: any): Promise<any | null> {
     try {
       const { data, error } = await fromTable('daily_summary')
         .update(updates)
@@ -81,7 +81,7 @@ export const dailySummaryService = {
     }
   },
 
-  async deleteDailySummary(id: number): Promise<boolean> {
+  async deleteDailySummary(id: string): Promise<boolean> {
     try {
       const { error } = await fromTable('daily_summary')
         .delete()

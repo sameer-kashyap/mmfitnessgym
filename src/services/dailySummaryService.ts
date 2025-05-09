@@ -1,12 +1,11 @@
 
-import { supabase } from "@/integrations/supabase/client";
+import { fromTable } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/sonner";
 
 export const dailySummaryService = {
   async getDailySummaries(): Promise<any[]> {
     try {
-      const { data, error } = await supabase
-        .from('daily_summary')
+      const { data, error } = await fromTable('daily_summary')
         .select('*')
         .order('date', { ascending: false });
 
@@ -24,8 +23,7 @@ export const dailySummaryService = {
 
   async getDailySummaryByDate(date: string): Promise<any | null> {
     try {
-      const { data, error } = await supabase
-        .from('daily_summary')
+      const { data, error } = await fromTable('daily_summary')
         .select('*')
         .eq('date', date)
         .single();
@@ -44,8 +42,7 @@ export const dailySummaryService = {
 
   async addDailySummary(summary: any): Promise<any | null> {
     try {
-      const { data, error } = await supabase
-        .from('daily_summary')
+      const { data, error } = await fromTable('daily_summary')
         .insert([summary])
         .select('*')
         .single();
@@ -65,8 +62,7 @@ export const dailySummaryService = {
 
   async updateDailySummary(id: number, updates: any): Promise<any | null> {
     try {
-      const { data, error } = await supabase
-        .from('daily_summary')
+      const { data, error } = await fromTable('daily_summary')
         .update(updates)
         .eq('id', id)
         .select('*')
@@ -87,8 +83,7 @@ export const dailySummaryService = {
 
   async deleteDailySummary(id: number): Promise<boolean> {
     try {
-      const { error } = await supabase
-        .from('daily_summary')
+      const { error } = await fromTable('daily_summary')
         .delete()
         .eq('id', id);
 

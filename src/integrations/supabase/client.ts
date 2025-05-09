@@ -9,4 +9,10 @@ const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
+// Create a more flexible client that allows access to tables not defined in the types
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+// Helper function to bypass TypeScript restrictions for tables not in the schema yet
+export const fromTable = (tableName: string) => {
+  return supabase.from(tableName as any);
+};

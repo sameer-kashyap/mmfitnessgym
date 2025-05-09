@@ -30,7 +30,7 @@ export const transformMemberFromDB = (dbMember: any): Member => {
     created_at: dbMember.created_at,
     updated_at: dbMember.updated_at,
     
-    // Special properties
+    // Special properties - now properly handling the JSON structure
     reminder_sent: dbMember.reminder_sent || {
       sevenDays: false,
       threeDays: false,

@@ -46,6 +46,7 @@ export type Database = {
           joining_date: string
           payment_status: string | null
           phone: string
+          reminder_sent: Json | null
           subscription_duration: number
           subscription_expiry: string | null
           updated_at: string | null
@@ -62,6 +63,7 @@ export type Database = {
           joining_date: string
           payment_status?: string | null
           phone: string
+          reminder_sent?: Json | null
           subscription_duration: number
           subscription_expiry?: string | null
           updated_at?: string | null
@@ -78,6 +80,7 @@ export type Database = {
           joining_date?: string
           payment_status?: string | null
           phone?: string
+          reminder_sent?: Json | null
           subscription_duration?: number
           subscription_expiry?: string | null
           updated_at?: string | null

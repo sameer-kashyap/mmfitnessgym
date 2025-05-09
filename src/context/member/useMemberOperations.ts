@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Member } from "@/types/member";
 import { memberService } from "@/services/memberService";
@@ -38,6 +37,10 @@ export const useMemberOperations = () => {
 
     // Transform to DB format before sending to API
     const dbMember = transformMemberToDB(newMember);
+    
+    // Log the data being sent to the database
+    console.log("Sending to database:", dbMember);
+    
     const addedMember = await memberService.addMember(dbMember);
     
     if (addedMember) {

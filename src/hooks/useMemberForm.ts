@@ -117,8 +117,9 @@ export const useMemberForm = () => {
       phone: formData.phone.trim(),
       subscription_duration: parseInt(formData.subscription_duration),
       payment_status: formData.payment_status as 'paid' | 'unpaid',
-      date_of_birth: formattedDob,
-      start_date: format(parsedJoiningDate, "yyyy-MM-dd"),
+      // Use dob instead of date_of_birth to match DB schema
+      dob: formattedDob,
+      joining_date: format(parsedJoiningDate, "yyyy-MM-dd"),
       deposit: parseFloat(formData.deposit) || 0,
       due: parseFloat(formData.due) || 0,
       description: formData.description?.trim(),

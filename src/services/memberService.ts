@@ -25,11 +25,26 @@ export const memberService = {
 
   async addMember(member: any): Promise<any | null> {
     try {
+      // Map date_of_birth to dob to match the database schema
+      const memberToInsert = { ...member };
+      
+      if (memberToInsert.date_of_birth) {
+        memberToInsert.dob = memberToInsert.date_of_birth;
+        delete memberToInsert.date_of_birth;
+      }
+      
+      // Similarly handle any other fields that might be misnamed
+      if (memberToInsert.startDate && !memberToInsert.joining_date) {
+        memberToInsert.joining_date = memberToInsert.startDate;
+      }
+
+      console.log('Inserting member with data:', memberToInsert);
+
       const { data, error } = await supabase
         .from('members')
-        .insert([member])
-        .select('*')
-        .single();
+        .insert([memberToInsert])
+        .select()
+        .maybeSingle();
 
       if (error) {
         throw error;
@@ -46,12 +61,25 @@ export const memberService = {
 
   async updateMember(id: string, updates: any): Promise<any | null> {
     try {
+      // Map date_of_birth to dob to match the database schema
+      const updatesToApply = { ...updates };
+      
+      if (updatesToApply.date_of_birth) {
+        updatesToApply.dob = updatesToApply.date_of_birth;
+        delete updatesToApply.date_of_birth;
+      }
+      
+      // Similarly handle any other fields that might be misnamed
+      if (updatesToApply.startDate && !updatesToApply.joining_date) {
+        updatesToApply.joining_date = updatesToApply.startDate;
+      }
+
       const { data, error } = await supabase
         .from('members')
-        .update(updates)
+        .update(updatesToApply)
         .eq('id', id)
-        .select('*')
-        .single();
+        .select()
+        .maybeSingle();
 
       if (error) {
         throw error;
